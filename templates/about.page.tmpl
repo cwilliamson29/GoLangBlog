@@ -1,4 +1,4 @@
-{{template "base"}}
+{{template "base" .}}
 {{define "content"}}
 
     <div class="container">
@@ -6,6 +6,14 @@
             <div class="col">
                 <h1>{{index .StrMap "title"}}</h1>
                 <p>{{index .StrMap "intro"}}</p>
+
+                <p>
+                    {{if ne (index .StrMap "userid") ""}}
+                        Your user id is {{index .StrMap "userid"}}
+                    {{else}}
+                        You aren't logged in. Login here <a href="/">LOGIN</a>
+                    {{end}}
+                </p>
             </div>
         </div>
     </div>
