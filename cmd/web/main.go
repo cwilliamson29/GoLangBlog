@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/gob"
 	"github.com/alexedwards/scs/v2"
+	"github.com/cwilliamson29/GoLangBlog/models"
 	"github.com/cwilliamson29/GoLangBlog/pkg/config"
 	"github.com/cwilliamson29/GoLangBlog/pkg/handlers"
 	"log"
@@ -13,6 +15,8 @@ var sessionManager *scs.SessionManager
 var app config.AppConfig
 
 func main() {
+	gob.Register(models.Article{})
+
 	sessionManager = scs.New()
 	sessionManager.Lifetime = 24 * time.Hour
 	sessionManager.Cookie.Persist = true
