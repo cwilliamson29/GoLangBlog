@@ -1,10 +1,12 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/gob"
 	"github.com/alexedwards/scs/v2"
 	"github.com/cwilliamson29/GoLangBlog/models"
 	"github.com/cwilliamson29/GoLangBlog/pkg/config"
+	"github.com/cwilliamson29/GoLangBlog/pkg/dbdriver"
 	"github.com/cwilliamson29/GoLangBlog/pkg/handlers"
 	"log"
 	"net/http"
@@ -24,18 +26,32 @@ func main() {
 	sessionManager.Cookie.SameSite = http.SameSiteLaxMode
 	app.Session = sessionManager
 
-	port := ":8080"
+	db, err := dbdriver.ConnectSQL("host=localhost port=5432 dbname=blog_db user=postgres password=TurtleDove")
+	if err != nil {
+		log.Fatal("cant connect to db: ", err)
+	}
 
-	repo := handlers.NewRepo(&app)
+	repo := handlers.NewRepo(&app, db)
 	handlers.NewHandlers(repo)
 
+	defer func(SQL *sql.DB) {
+		err := SQL.Close()
+		if err != nil {
+			
+		}
+	}(db.SQL)
+
 	srv := &http.Server{
-		Addr:    port,
+		Addr:    ":8080",
 		Handler: routes(&app),
 	}
 
-	err := srv.ListenAndServe()
+	err = srv.ListenAndServe()
 	if err != nil {
 		log.Fatal(err)
 	}
 }
+
+//func run() (*dbdriver.DB, error) {
+//
+//}

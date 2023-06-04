@@ -3,21 +3,26 @@ package handlers
 import (
 	"github.com/cwilliamson29/GoLangBlog/models"
 	"github.com/cwilliamson29/GoLangBlog/pkg/config"
+	"github.com/cwilliamson29/GoLangBlog/pkg/dbdriver"
 	"github.com/cwilliamson29/GoLangBlog/pkg/forms"
 	"github.com/cwilliamson29/GoLangBlog/pkg/render"
+	"github.com/cwilliamson29/GoLangBlog/pkg/repository"
+	"github.com/cwilliamson29/GoLangBlog/pkg/repository/dbrepo"
 	"log"
 	"net/http"
 )
 
 type Repository struct {
 	App *config.AppConfig
+	DB  repository.DatabaseRepo
 }
 
 var Repo *Repository
 
-func NewRepo(ac *config.AppConfig) *Repository {
+func NewRepo(ac *config.AppConfig, db *dbdriver.DB) *Repository {
 	return &Repository{
 		App: ac,
+		DB:  dbrepo.NewPostGresRepo(db.SQL, ac),
 	}
 }
 
