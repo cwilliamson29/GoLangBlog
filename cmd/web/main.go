@@ -18,6 +18,8 @@ var app config.AppConfig
 
 func main() {
 	gob.Register(models.Article{})
+	gob.Register(models.User{})
+	gob.Register(models.Post{})
 
 	sessionManager = scs.New()
 	sessionManager.Lifetime = 24 * time.Hour
@@ -37,7 +39,7 @@ func main() {
 	defer func(SQL *sql.DB) {
 		err := SQL.Close()
 		if err != nil {
-			
+
 		}
 	}(db.SQL)
 

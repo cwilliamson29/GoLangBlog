@@ -74,9 +74,10 @@ func (m *Repository) PostMakePostHandler(w http.ResponseWriter, r *http.Request)
 		log.Println(err)
 		return
 	}
-	article := models.Article{
-		BlogTitle:   r.Form.Get("blog_title"),
-		BlogArticle: r.Form.Get("blog_article"),
+	article := models.Post{
+		Title:   r.Form.Get("blog_title"),
+		Content: r.Form.Get("blog_article"),
+		UserID:  1,
 	}
 
 	form := forms.New(r.PostForm)
@@ -96,6 +97,12 @@ func (m *Repository) PostMakePostHandler(w http.ResponseWriter, r *http.Request)
 		})
 		return
 	}
+	// Write to the DB
+	err = m.DB.InsertPost(article)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	m.App.Session.Put(r.Context(), "article", article)
 	http.Redirect(w, r, "/article-received", http.StatusSeeOther)
 }
@@ -114,4 +121,35 @@ func (m *Repository) ArticleReceived(w http.ResponseWriter, r *http.Request) {
 	render.RenderTemplate(w, r, "article-received.page.tmpl", &models.PageData{
 		Data: data,
 	})
+}
+
+// PostLoginHandler - for getting the individual pages
+func (m *Repository) PostLoginHandler(w http.ResponseWriter, r *http.Request) {
+	//strMap := make(map[string]string)
+	_ = m.App.Session.RenewToken(r.Context())
+	err := r.ParseForm()
+	if err != nil {
+		log.Fatal(err)
+	}
+	email := r.Form.Get("email")
+	password := r.Form.Get("password")
+
+	form := forms.New(r.PostForm)
+	form.HasRequired("email", "password")
+	form.IsEmail("email")
+
+	if !form.Valid() {
+		render.RenderTemplate(w, r, "login.page.tmpl", &models.PageData{Form: form})
+		return
+	}
+	id, _, err := m.DB.AuthenticateUser(email, password)
+	if err != nil {
+		m.App.Session.Put(r.Context(), "error", "Invalid Email OR Password")
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+	m.App.Session.Put(r.Context(), "user_id", id)
+	m.App.Session.Put(r.Context(), "flash", "Valid Login")
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+	//render.RenderTemplate(w, r, "page.page.tmpl", &models.PageData{StrMap: strMap})
 }
