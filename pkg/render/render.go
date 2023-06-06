@@ -51,7 +51,7 @@ func RenderTemplate(w http.ResponseWriter, r *http.Request, t string, pd *models
 func makeTemplateCache(t string) error {
 	templates := []string{
 		fmt.Sprintf("./templates/%s", t),
-		"./templates/base.layout.tmpl", "./templates/menu.page.tmpl",
+		"./templates/base.layout.tmpl", "./templates/navbar.page.tmpl",
 	}
 
 	tmpl, err := template.ParseFiles(templates...)
