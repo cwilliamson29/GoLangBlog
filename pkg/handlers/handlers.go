@@ -153,3 +153,9 @@ func (m *Repository) PostLoginHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 	//render.RenderTemplate(w, r, "page.page.tmpl", &models.PageData{StrMap: strMap})
 }
+
+func (m *Repository) LogoutHandler(w http.ResponseWriter, r *http.Request) {
+	_ = m.App.Session.Destroy(r.Context())
+	_ = m.App.Session.RenewToken(r.Context())
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
+}

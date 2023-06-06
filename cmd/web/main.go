@@ -8,6 +8,7 @@ import (
 	"github.com/cwilliamson29/GoLangBlog/pkg/config"
 	"github.com/cwilliamson29/GoLangBlog/pkg/dbdriver"
 	"github.com/cwilliamson29/GoLangBlog/pkg/handlers"
+	"github.com/cwilliamson29/GoLangBlog/pkg/render"
 	"log"
 	"net/http"
 	"time"
@@ -17,6 +18,7 @@ var sessionManager *scs.SessionManager
 var app config.AppConfig
 
 func main() {
+	render.NewAppConfig(&app)
 	gob.Register(models.Article{})
 	gob.Register(models.User{})
 	gob.Register(models.Post{})
@@ -52,6 +54,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 }
 
 //func run() (*dbdriver.DB, error) {

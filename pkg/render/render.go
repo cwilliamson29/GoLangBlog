@@ -3,6 +3,7 @@ package render
 import (
 	"fmt"
 	"github.com/cwilliamson29/GoLangBlog/models"
+	"github.com/cwilliamson29/GoLangBlog/pkg/config"
 	"github.com/justinas/nosurf"
 	"html/template"
 	"net/http"
@@ -10,8 +11,18 @@ import (
 
 var tmplCache = make(map[string]*template.Template)
 
+var app *config.AppConfig
+
+func NewAppConfig(a *config.AppConfig) {
+	app = a
+}
+
 func AddCSRFData(pd *models.PageData, r *http.Request) *models.PageData {
 	pd.CSRFToken = nosurf.Token(r)
+
+	if app.Session.Exists(r.Context(), "user_id") {
+		pd.IsAuthenticated = 1
+	}
 	return pd
 }
 
