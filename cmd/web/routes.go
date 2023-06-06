@@ -26,9 +26,10 @@ func routes(app *config.AppConfig) http.Handler {
 	mux.Get("/article-received", handlers.Repo.ArticleReceived)
 	mux.Get("/page", handlers.Repo.PageHandler)
 
-	fileServer := http.FileServer(http.Dir("./static/"))
+	fileServer := http.FileServer(http.Dir("./templates/"))
 	mux.Handle("/static/*", http.StripPrefix("/static", fileServer))
-	mux.Handle("/css/*", http.StripPrefix("/css/", http.FileServer(http.Dir("./css"))))
+	//mux.Handle("/templates/*", http.StripPrefix("./templates", fileServer))
+	//mux.Handle("/css/*", http.StripPrefix("/css/", http.FileServer(http.Dir("./css"))))
 
 	return mux
 }
