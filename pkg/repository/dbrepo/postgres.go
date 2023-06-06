@@ -94,3 +94,48 @@ func (m *postgresDBRepo) AuthenticateUser(email string, password string) (int, s
 	}
 	return id, hashedPW, nil
 }
+
+func (m *postgresDBRepo) GetBlogPost() (int, int, string, string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	var id, uID int
+	var aTitle, aContent string
+
+	query := `SELECT id, user_id, title, content FROM posts LIMIT 1`
+
+	row := m.DB.QueryRowContext(ctx, query)
+
+	err := row.Scan(&id, &uID, &aTitle, &aContent)
+
+	if err != nil {
+		return id, uID, "", "", err
+	}
+	return id, uID, aTitle, aContent, nil
+}
+
+func (m *postgresDBRepo) Get3BlogPost() (models.ArticleList, error) {
+	var artList models.ArticleList
+
+	rows, err := m.DB.Query("SELECT id, user_id, title, content FROM posts ORDER BY id DESC LIMIT $1", 3)
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var id, uID int
+		var title, content string
+		err = rows.Scan(&id, &uID, &title, &content)
+		if err != nil {
+			panic(err)
+		}
+		artList.ID = append(artList.ID, id)
+		artList.UserID = append(artList.UserID, uID)
+		artList.Title = append(artList.Title, title)
+		artList.Content = append(artList.Content, content)
+	}
+	err = rows.Err()
+	if err != nil {
+		panic(err)
+	}
+	return artList, nil
+}

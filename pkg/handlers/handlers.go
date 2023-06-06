@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/cwilliamson29/GoLangBlog/models"
 	"github.com/cwilliamson29/GoLangBlog/pkg/config"
 	"github.com/cwilliamson29/GoLangBlog/pkg/dbdriver"
@@ -32,8 +33,33 @@ func NewHandlers(r *Repository) {
 
 // HomeHandler - for getting the home page
 func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
+	//id, uid, title, content, err := m.DB.GetBlogPost()
+	//if err != nil {
+	//	log.Println("err")
+	//	return
+	//}
+	//fmt.Println("ID: ", id)
+	//fmt.Println("UID: ", uid)
+	//fmt.Println("Title: ", title)
+	//fmt.Println("Content: ", content)
+	var artList models.ArticleList
+	artList, err := m.DB.Get3BlogPost()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	for i := range artList.Content {
+		fmt.Println(artList.Content[i])
+	}
+
 	m.App.Session.Put(r.Context(), "userid", "cwilliamson")
-	render.RenderTemplate(w, r, "home.page.tmpl", &models.PageData{})
+	data := make(map[string]interface{})
+
+	data["articleList"] = artList
+
+	render.RenderTemplate(w, r, "home.page.tmpl", &models.PageData{
+		Data: data,
+	})
 }
 
 // AboutHandler - for getting the about page
@@ -56,6 +82,9 @@ func (m *Repository) PageHandler(w http.ResponseWriter, r *http.Request) {
 
 // MakePostHandler - for creating new posts
 func (m *Repository) MakePostHandler(w http.ResponseWriter, r *http.Request) {
+	if !m.App.Session.Exists(r.Context(), "user_id") {
+		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
+	}
 	var emptyArticle models.Article
 	data := make(map[string]interface{})
 	data["article"] = emptyArticle
@@ -74,10 +103,12 @@ func (m *Repository) PostMakePostHandler(w http.ResponseWriter, r *http.Request)
 		log.Println(err)
 		return
 	}
+
+	uID := (m.App.Session.Get(r.Context(), "user_id")).(int)
 	article := models.Post{
 		Title:   r.Form.Get("blog_title"),
 		Content: r.Form.Get("blog_article"),
-		UserID:  1,
+		UserID:  int(uID),
 	}
 
 	form := forms.New(r.PostForm)

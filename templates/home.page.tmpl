@@ -1,13 +1,17 @@
-{{template "base"}}
+{{template "base" .}}
 {{define "content"}}
 
-    <div class="container">
-        <div class="row">
-            <div class="col">
-                <h1>Home</h1>
-                <p> ******** Lorem Ipsum devorny corny Torny</p>
-            </div>
-        </div>
-    </div>
+    <article class="blog-post">
+
+        {{$res := index .Data "articleList"}}
+        <h2 class="blog-post-title mb-1">{{index $res.Title 0}}</h2>
+        <p>{{index $res.Content 0}}</p>
+
+        <h2 class="blog-post-title mb-1">{{index $res.Title 1}}</h2>
+        <p>{{index $res.Content 1}}</p>
+
+            <h2 class="blog-post-title mb-1">{{index $res.Title 2}}</h2>
+        <p>{{index $res.Content 2}}</p>
+    </article>
 
 {{end}}
