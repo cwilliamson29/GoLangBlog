@@ -26,6 +26,9 @@ func routes(app *config.AppConfig) http.Handler {
 	mux.Get("/article-received", handlers.Repo.ArticleReceived)
 	mux.Get("/page", handlers.Repo.PageHandler)
 
+	// ADMIN routes
+	mux.Get("/admin", handlers.Repo.AdminHandler)
+
 	fileServer := http.FileServer(http.Dir("./templates/"))
 	mux.Handle("/static/*", http.StripPrefix("/static", fileServer))
 	//mux.Handle("/templates/*", http.StripPrefix("./templates", fileServer))

@@ -33,6 +33,8 @@ func NewHandlers(r *Repository) {
 
 // HomeHandler - for getting the home page
 func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
+	ut := m.App.Session.Get(r.Context(), "user_type")
+	log.Println("user type: ", ut)
 	//id, uid, title, content, err := m.DB.GetBlogPost()
 	//if err != nil {
 	//	log.Println("err")
@@ -138,6 +140,7 @@ func (m *Repository) PostMakePostHandler(w http.ResponseWriter, r *http.Request)
 	http.Redirect(w, r, "/article-received", http.StatusSeeOther)
 }
 
+// ArticleReceived - get article
 func (m *Repository) ArticleReceived(w http.ResponseWriter, r *http.Request) {
 	article, ok := m.App.Session.Get(r.Context(), "article").(models.Article)
 	if !ok {
@@ -174,12 +177,14 @@ func (m *Repository) PostLoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	id, _, err := m.DB.AuthenticateUser(email, password)
+	u, err := m.DB.GetUserById(id)
 	if err != nil {
 		m.App.Session.Put(r.Context(), "error", "Invalid Email OR Password")
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
 	m.App.Session.Put(r.Context(), "user_id", id)
+	m.App.Session.Put(r.Context(), "user_type", u.UserType)
 	m.App.Session.Put(r.Context(), "flash", "Valid Login")
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 	//render.RenderTemplate(w, r, "page.page.tmpl", &models.PageData{StrMap: strMap})

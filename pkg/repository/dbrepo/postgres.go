@@ -75,12 +75,13 @@ func (m *postgresDBRepo) AuthenticateUser(email string, password string) (int, s
 
 	var id int
 	var hashedPW string
+	var userType int
 
-	query := `SELECT id, password FROM users WHERE email=$1`
+	query := `SELECT id, password, user_type FROM users WHERE email=$1`
 
 	row := m.DB.QueryRowContext(ctx, query, email)
 
-	err := row.Scan(&id, &hashedPW)
+	err := row.Scan(&id, &hashedPW, &userType)
 
 	if err != nil {
 		return id, "", err
