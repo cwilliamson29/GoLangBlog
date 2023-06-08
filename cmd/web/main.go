@@ -9,6 +9,7 @@ import (
 	"github.com/cwilliamson29/GoLangBlog/pkg/dbdriver"
 	"github.com/cwilliamson29/GoLangBlog/pkg/handlers"
 	"github.com/cwilliamson29/GoLangBlog/pkg/render"
+	"html/template"
 	"log"
 	"net/http"
 	"time"
@@ -29,6 +30,9 @@ func main() {
 	sessionManager.Cookie.Secure = false
 	sessionManager.Cookie.SameSite = http.SameSiteLaxMode
 	app.Session = sessionManager
+
+	app.AdminTemplates = template.Must(template.ParseGlob("./templates/admin/*.tmpl"))
+	app.UITemplates = template.Must(template.ParseGlob("./templates/ui/*.tmpl"))
 
 	db, err := dbdriver.ConnectSQL("host=localhost port=5432 dbname=blog_db user=postgres password=TurtleDove")
 	if err != nil {

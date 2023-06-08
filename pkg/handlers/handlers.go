@@ -16,6 +16,8 @@ import (
 type Repository struct {
 	App *config.AppConfig
 	DB  repository.DatabaseRepo
+	//AdminTemplates *template.Template
+	//UITemplates    *template.Template
 }
 
 var Repo *Repository
@@ -35,15 +37,7 @@ func NewHandlers(r *Repository) {
 func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 	ut := m.App.Session.Get(r.Context(), "user_type")
 	log.Println("user type: ", ut)
-	//id, uid, title, content, err := m.DB.GetBlogPost()
-	//if err != nil {
-	//	log.Println("err")
-	//	return
-	//}
-	//fmt.Println("ID: ", id)
-	//fmt.Println("UID: ", uid)
-	//fmt.Println("Title: ", title)
-	//fmt.Println("Content: ", content)
+
 	var artList models.ArticleList
 	artList, err := m.DB.Get3BlogPost()
 	if err != nil {
@@ -58,28 +52,34 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 	data := make(map[string]interface{})
 
 	data["articleList"] = artList
-
-	render.RenderTemplate(w, r, "home.page.tmpl", &models.PageData{
+	m.App.UITemplates.ExecuteTemplate(w, "home.page.tmpl", &models.PageData{
 		Data: data,
 	})
+	//render.RenderTemplate(w, r, "home.page.tmpl", &models.PageData{
+	//	Data: data,
+	//})
 }
 
 // AboutHandler - for getting the about page
 func (m *Repository) AboutHandler(w http.ResponseWriter, r *http.Request) {
-	strMap := make(map[string]string)
-	render.RenderTemplate(w, r, "about.page.tmpl", &models.PageData{StrMap: strMap})
+	//strMap := make(map[string]string)
+	//render.RenderTemplate(w, r, "about.page.tmpl", &models.PageData{StrMap: strMap})
+	m.App.UITemplates.ExecuteTemplate(w, "about.page.tmpl", &models.PageData{})
 }
 
 // LoginHandler - for getting the login page
 func (m *Repository) LoginHandler(w http.ResponseWriter, r *http.Request) {
-	strMap := make(map[string]string)
-	render.RenderTemplate(w, r, "login.page.tmpl", &models.PageData{StrMap: strMap})
+	//strMap := make(map[string]string)
+	//render.RenderTemplate(w, r, "login.page.tmpl", &models.PageData{StrMap: strMap})
+	m.App.UITemplates.ExecuteTemplate(w, "login.page.tmpl", &models.PageData{})
 }
 
 // PageHandler - for getting the individual pages
 func (m *Repository) PageHandler(w http.ResponseWriter, r *http.Request) {
-	strMap := make(map[string]string)
-	render.RenderTemplate(w, r, "page.page.tmpl", &models.PageData{StrMap: strMap})
+	//strMap := make(map[string]string)
+	//render.RenderTemplate(w, r, "page.page.tmpl", &models.PageData{StrMap: strMap})
+	m.App.UITemplates.ExecuteTemplate(w, "page.page.tmpl", &models.PageData{})
+
 }
 
 // MakePostHandler - for creating new posts

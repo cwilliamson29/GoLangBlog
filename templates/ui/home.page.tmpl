@@ -1,17 +1,16 @@
-{{template "base" .}}
-{{define "content"}}
+{{template "header" .}}
 
-    <article class="blog-post">
+<article class="blog-post">
 
-        {{$res := index .Data "articleList"}}
-        <h2 class="blog-post-title mb-1">{{index $res.Title 0}}</h2>
-        <p>{{index $res.Content 0}}</p>
+    {{$res := index .Data "articleList"}}
+    <h2 class="blog-post-title mb-1">{{index $res.Title 0}}</h2>
+    <p>{{index $res.Content 0}}</p>
 
-        <h2 class="blog-post-title mb-1">{{index $res.Title 0}}</h2>
-        <p>{{index $res.Content 0}}</p>
+    <h2 class="blog-post-title mb-1">{{index $res.Title 0}}</h2>
+    <p>{{index $res.Content 0}}</p>
 
-        <h2 class="blog-post-title mb-1">{{index $res.Title 0}}</h2>
-        <p>{{index $res.Content 0}}</p>
-    </article>
+    <h2 class="blog-post-title mb-1">{{index $res.Title 0}}</h2>
+    <p>{{index $res.Content 0}}</p>
+</article>
 
-{{end}}
+{{template "footer" .}}
