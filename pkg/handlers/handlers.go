@@ -177,14 +177,12 @@ func (m *Repository) PostLoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	id, _, err := m.DB.AuthenticateUser(email, password)
-	u, err := m.DB.GetUserById(id)
 	if err != nil {
 		m.App.Session.Put(r.Context(), "error", "Invalid Email OR Password")
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
 	m.App.Session.Put(r.Context(), "user_id", id)
-	m.App.Session.Put(r.Context(), "user_type", u.UserType)
 	m.App.Session.Put(r.Context(), "flash", "Valid Login")
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 	//render.RenderTemplate(w, r, "page.page.tmpl", &models.PageData{StrMap: strMap})
