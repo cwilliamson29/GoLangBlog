@@ -18,17 +18,31 @@ func (m *Repository) UnauthorizedHandler(w http.ResponseWriter, r *http.Request)
 
 // LoginHandler - for getting the login page
 func (m *Repository) AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
-	strMap := make(map[string]string)
-	render.RenderUnauthorizedTemplate(w, r, "authorizeLogin.page.tmpl", &models.PageData{StrMap: strMap})
+	//strMap := make(map[string]string)
+	//render.RenderUnauthorizedTemplate(w, r, "authorizeLogin.page.tmpl", &models.PageData{StrMap: strMap})
+	err := m.App.UITemplates.ExecuteTemplate(w, "authorizeLogin.page.tmpl", &models.PageData{})
+	if err != nil {
+		return
+	}
 }
 
 // AdminHandler - for getting the admin page
 func (m *Repository) AdminHandler(w http.ResponseWriter, r *http.Request) {
+	pd := m.AddCSRFData(&models.PageData{}, r)
+
 	uid := m.App.Session.Get(r.Context(), "user_id")
 	id, _ := uid.(int)
 	// Check if user logged in
 	if !m.App.Session.Exists(r.Context(), "user_id") {
-		render.RenderUnauthorizedTemplate(w, r, "authorizeLogin.page.tmpl", &models.PageData{})
+		//render.RenderUnauthorizedTemplate(w, r, "authorizeLogin.page.tmpl", &models.PageData{})
+		err := m.App.UITemplates.ExecuteTemplate(w, "login.page.tmpl", &models.PageData{
+			CSRFToken:       pd.CSRFToken,
+			IsAuthenticated: pd.IsAuthenticated,
+		})
+		if err != nil {
+			http.Error(w, "unable to execute the template", http.StatusInternalServerError)
+			return
+		}
 	} else {
 		u, _ := m.DB.GetUserById(id)
 		//log.Println("user_type: ", u.UserType, "and bool: ", u.UserType == 3)
@@ -37,6 +51,13 @@ func (m *Repository) AdminHandler(w http.ResponseWriter, r *http.Request) {
 			render.RenderUnauthorizedTemplate(w, r, "unauthorized.page.tmpl", &models.PageData{})
 		} else {
 			render.RenderAdminTemplate(w, r, "admin.page.tmpl", &models.PageData{})
+			err := m.App.AdminTemplates.ExecuteTemplate(w, "admin.page.tmpl", &models.PageData{
+				CSRFToken:       pd.CSRFToken,
+				IsAuthenticated: pd.IsAuthenticated,
+			})
+			if err != nil {
+				return
+			}
 		}
 	}
 }

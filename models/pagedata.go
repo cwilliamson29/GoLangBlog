@@ -1,8 +1,11 @@
 package models
 
-import "github.com/cwilliamson29/GoLangBlog/pkg/forms"
+import (
+	"github.com/cwilliamson29/GoLangBlog/pkg/forms"
+)
 
 type PageData struct {
+	UserInfo        map[string]string
 	StrMap          map[string]string
 	IntMap          map[string]int
 	FltMap          map[string]float32

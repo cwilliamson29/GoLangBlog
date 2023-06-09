@@ -1,16 +1,32 @@
-{{template "header" .}}
+<!doctype html>
+<html lang="en">
+{{template "headerInclude" .}}
+<body>
+{{template "navbar" .}}
+{{template "featured" .}}
+<div class="container">
+    <div class="row g-5">
+        <div class="col-md-8">
+            <!-- Content Here -->
+            <article class="blog-post">
+                {{$res := index .Data "articleList"}}
+                <h2 class="blog-post-title mb-1">{{index $res.Title 0}}</h2>
+                <p>{{index $res.Content 0}}</p>
 
-<article class="blog-post">
+                <h2 class="blog-post-title mb-1">{{index $res.Title 1}}</h2>
+                <p>{{index $res.Content 1}}</p>
 
-    {{$res := index .Data "articleList"}}
-    <h2 class="blog-post-title mb-1">{{index $res.Title 0}}</h2>
-    <p>{{index $res.Content 0}}</p>
+                <h2 class="blog-post-title mb-1">{{index $res.Title 2}}</h2>
+                <p>{{index $res.Content 2}}</p>
+            </article>
+            <!-- ------------ -->
+        </div>
 
-    <h2 class="blog-post-title mb-1">{{index $res.Title 0}}</h2>
-    <p>{{index $res.Content 0}}</p>
+        {{template "archivesBar"}}
 
-    <h2 class="blog-post-title mb-1">{{index $res.Title 0}}</h2>
-    <p>{{index $res.Content 0}}</p>
-</article>
+    </div>
+</div>
 
-{{template "footer" .}}
+{{template "footerInclude" .}}
+</body>
+</html>

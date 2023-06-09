@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"github.com/cwilliamson29/GoLangBlog/models"
 	"github.com/cwilliamson29/GoLangBlog/pkg/config"
 	"github.com/cwilliamson29/GoLangBlog/pkg/dbdriver"
@@ -9,6 +8,7 @@ import (
 	"github.com/cwilliamson29/GoLangBlog/pkg/render"
 	"github.com/cwilliamson29/GoLangBlog/pkg/repository"
 	"github.com/cwilliamson29/GoLangBlog/pkg/repository/dbrepo"
+	"github.com/justinas/nosurf"
 	"log"
 	"net/http"
 )
@@ -33,10 +33,21 @@ func NewHandlers(r *Repository) {
 	Repo = r
 }
 
+func (m *Repository) AddCSRFData(pd *models.PageData, r *http.Request) *models.PageData {
+	pd.CSRFToken = nosurf.Token(r)
+
+	if m.App.Session.Exists(r.Context(), "user_id") {
+		pd.IsAuthenticated = 1
+	}
+	return pd
+}
+
 // HomeHandler - for getting the home page
 func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
-	ut := m.App.Session.Get(r.Context(), "user_type")
-	log.Println("user type: ", ut)
+	//ut := m.App.Session.Get(r.Context(), "user_type")
+	//log.Println("user type: ", ut)
+
+	pd := m.AddCSRFData(&models.PageData{}, r)
 
 	var artList models.ArticleList
 	artList, err := m.DB.Get3BlogPost()
@@ -44,46 +55,74 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-	for i := range artList.Content {
-		fmt.Println(artList.Content[i])
-	}
+	//for i := range artList.Content {
+	//	fmt.Println(artList.Content[i])
+	//}
 
-	m.App.Session.Put(r.Context(), "userid", "cwilliamson")
+	//m.App.Session.Put(r.Context(), "userid", "cwilliamson")
 	data := make(map[string]interface{})
 
 	data["articleList"] = artList
-	m.App.UITemplates.ExecuteTemplate(w, "home.page.tmpl", &models.PageData{
-		Data: data,
+	err = m.App.UITemplates.ExecuteTemplate(w, "home.page.tmpl", &models.PageData{
+		Data:            data,
+		CSRFToken:       pd.CSRFToken,
+		IsAuthenticated: pd.IsAuthenticated,
 	})
-	//render.RenderTemplate(w, r, "home.page.tmpl", &models.PageData{
-	//	Data: data,
-	//})
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 // AboutHandler - for getting the about page
 func (m *Repository) AboutHandler(w http.ResponseWriter, r *http.Request) {
 	//strMap := make(map[string]string)
 	//render.RenderTemplate(w, r, "about.page.tmpl", &models.PageData{StrMap: strMap})
-	m.App.UITemplates.ExecuteTemplate(w, "about.page.tmpl", &models.PageData{})
+	pd := m.AddCSRFData(&models.PageData{}, r)
+
+	err := m.App.UITemplates.ExecuteTemplate(w, "about.page.tmpl", &models.PageData{
+		CSRFToken:       pd.CSRFToken,
+		IsAuthenticated: pd.IsAuthenticated})
+	if err != nil {
+		return
+	}
 }
 
 // LoginHandler - for getting the login page
 func (m *Repository) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	//strMap := make(map[string]string)
 	//render.RenderTemplate(w, r, "login.page.tmpl", &models.PageData{StrMap: strMap})
-	m.App.UITemplates.ExecuteTemplate(w, "login.page.tmpl", &models.PageData{})
+	pd := m.AddCSRFData(&models.PageData{}, r)
+
+	//token := nosurf.Token(r)
+	//data := map[string]interface{}{
+	//	"CSRFToken": token,
+	//}
+	//log.Println(data["CSRFToken"])
+
+	err := m.App.UITemplates.ExecuteTemplate(w, "login.page.tmpl", &models.PageData{
+		CSRFToken:       pd.CSRFToken,
+		IsAuthenticated: pd.IsAuthenticated})
+	if err != nil {
+		http.Error(w, "unable to execute the template", http.StatusInternalServerError)
+		return
+	}
 }
 
 // PageHandler - for getting the individual pages
 func (m *Repository) PageHandler(w http.ResponseWriter, r *http.Request) {
 	//strMap := make(map[string]string)
 	//render.RenderTemplate(w, r, "page.page.tmpl", &models.PageData{StrMap: strMap})
-	m.App.UITemplates.ExecuteTemplate(w, "page.page.tmpl", &models.PageData{})
+	err := m.App.UITemplates.ExecuteTemplate(w, "page.page.tmpl", &models.PageData{})
+	if err != nil {
+		return
+	}
 
 }
 
 // MakePostHandler - for creating new posts
 func (m *Repository) MakePostHandler(w http.ResponseWriter, r *http.Request) {
+	pd := m.AddCSRFData(&models.PageData{}, r)
+
 	if !m.App.Session.Exists(r.Context(), "user_id") {
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 	}
@@ -92,8 +131,10 @@ func (m *Repository) MakePostHandler(w http.ResponseWriter, r *http.Request) {
 	data["article"] = emptyArticle
 
 	render.RenderTemplate(w, r, "make-post.page.tmpl", &models.PageData{
-		Form: forms.New(nil),
-		Data: data,
+		Form:            forms.New(nil),
+		Data:            data,
+		CSRFToken:       pd.CSRFToken,
+		IsAuthenticated: pd.IsAuthenticated,
 	})
 }
 
@@ -159,6 +200,8 @@ func (m *Repository) ArticleReceived(w http.ResponseWriter, r *http.Request) {
 
 // PostLoginHandler - for getting the individual pages
 func (m *Repository) PostLoginHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("here")
+
 	//strMap := make(map[string]string)
 	_ = m.App.Session.RenewToken(r.Context())
 	err := r.ParseForm()
@@ -173,7 +216,11 @@ func (m *Repository) PostLoginHandler(w http.ResponseWriter, r *http.Request) {
 	form.IsEmail("email")
 
 	if !form.Valid() {
-		render.RenderTemplate(w, r, "login.page.tmpl", &models.PageData{Form: form})
+		err := m.App.UITemplates.ExecuteTemplate(w, "login.page.tmpl", &models.PageData{Form: form})
+		if err != nil {
+			return
+		}
+		//render.RenderTemplate(w, r, "login.page.tmpl", &models.PageData{Form: form})
 		return
 	}
 	id, _, err := m.DB.AuthenticateUser(email, password)

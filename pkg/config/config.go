@@ -7,9 +7,9 @@ import (
 )
 
 type AppConfig struct {
-	InfoLog        *log.Logger
-	Session        *scs.SessionManager
-	CSRFToken      string
+	InfoLog *log.Logger
+	Session *scs.SessionManager
+	//CSRFToken      string
 	AdminTemplates *template.Template
 	UITemplates    *template.Template
 }
