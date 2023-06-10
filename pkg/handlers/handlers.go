@@ -5,7 +5,6 @@ import (
 	"github.com/cwilliamson29/GoLangBlog/pkg/config"
 	"github.com/cwilliamson29/GoLangBlog/pkg/dbdriver"
 	"github.com/cwilliamson29/GoLangBlog/pkg/forms"
-	"github.com/cwilliamson29/GoLangBlog/pkg/render"
 	"github.com/cwilliamson29/GoLangBlog/pkg/repository"
 	"github.com/cwilliamson29/GoLangBlog/pkg/repository/dbrepo"
 	"github.com/justinas/nosurf"
@@ -130,16 +129,27 @@ func (m *Repository) MakePostHandler(w http.ResponseWriter, r *http.Request) {
 	data := make(map[string]interface{})
 	data["article"] = emptyArticle
 
-	render.RenderTemplate(w, r, "make-post.page.tmpl", &models.PageData{
+	//render.RenderTemplate(w, r, "make-post.page.tmpl", &models.PageData{
+	//	Form:            forms.New(nil),
+	//	Data:            data,
+	//	CSRFToken:       pd.CSRFToken,
+	//	IsAuthenticated: pd.IsAuthenticated,
+	//})
+	err := m.App.UITemplates.ExecuteTemplate(w, "make-post.page.tmpl", &models.PageData{
 		Form:            forms.New(nil),
 		Data:            data,
 		CSRFToken:       pd.CSRFToken,
 		IsAuthenticated: pd.IsAuthenticated,
 	})
+	if err != nil {
+		return
+	}
+
 }
 
 // PostMakePostHandler - Post method for submitting new posts
 func (m *Repository) PostMakePostHandler(w http.ResponseWriter, r *http.Request) {
+	pd := m.AddCSRFData(&models.PageData{}, r)
 
 	err := r.ParseForm()
 	if err != nil {
@@ -165,10 +175,19 @@ func (m *Repository) PostMakePostHandler(w http.ResponseWriter, r *http.Request)
 		data := make(map[string]interface{})
 		data["article"] = article
 
-		render.RenderTemplate(w, r, "make-post.page.tmpl", &models.PageData{
-			Form: form,
-			Data: data,
+		//render.RenderTemplate(w, r, "make-post.page.tmpl", &models.PageData{
+		//	Form: form,
+		//	Data: data,
+		//})
+		err := m.App.UITemplates.ExecuteTemplate(w, "make-post.page.tmpl", &models.PageData{
+			Form:            form,
+			Data:            data,
+			CSRFToken:       pd.CSRFToken,
+			IsAuthenticated: pd.IsAuthenticated,
 		})
+		if err != nil {
+			return
+		}
 		return
 	}
 	// Write to the DB
@@ -183,6 +202,8 @@ func (m *Repository) PostMakePostHandler(w http.ResponseWriter, r *http.Request)
 
 // ArticleReceived - get article
 func (m *Repository) ArticleReceived(w http.ResponseWriter, r *http.Request) {
+	pd := m.AddCSRFData(&models.PageData{}, r)
+
 	article, ok := m.App.Session.Get(r.Context(), "article").(models.Article)
 	if !ok {
 		log.Println("Cant get data from session")
@@ -193,9 +214,17 @@ func (m *Repository) ArticleReceived(w http.ResponseWriter, r *http.Request) {
 	data := make(map[string]interface{})
 	data["article"] = article
 
-	render.RenderTemplate(w, r, "article-received.page.tmpl", &models.PageData{
-		Data: data,
+	//render.RenderTemplate(w, r, "article-received.page.tmpl", &models.PageData{
+	//	Data: data,
+	//})
+	err := m.App.UITemplates.ExecuteTemplate(w, "article-received.page.tmpl", &models.PageData{
+		Data:            data,
+		CSRFToken:       pd.CSRFToken,
+		IsAuthenticated: pd.IsAuthenticated,
 	})
+	if err != nil {
+		return
+	}
 }
 
 // PostLoginHandler - for getting the individual pages
