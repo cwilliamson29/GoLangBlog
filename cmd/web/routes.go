@@ -30,10 +30,8 @@ func routes(app *config.AppConfig) http.Handler {
 	// ADMIN routes
 	mux.Get("/admin", handlers.Repo.AdminHandler)
 	mux.Get("/admin/login", handlers.Repo.AdminLoginHandler)
+	mux.Post("/admin/login", handlers.Repo.PostAdminLoginHandler)
 	mux.Get("/admin/logout", handlers.Repo.LogoutHandler)
-
-	//Unauthorized routes
-	mux.Get("/unauthorized", handlers.Repo.UnauthorizedHandler)
 
 	fileServer := http.FileServer(http.Dir("./templates/"))
 	mux.Handle("/static/*", http.StripPrefix("/static", fileServer))

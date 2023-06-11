@@ -8,6 +8,10 @@ import (
 
 var app config.AppConfig
 
+// User type 1 - normal user
+// User type 2 - moderator user
+// User type 3 - admin user
+
 func ErrorCheck(err error) {
 	if err != nil {
 		log.Fatal(err)

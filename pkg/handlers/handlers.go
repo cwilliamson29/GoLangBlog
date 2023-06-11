@@ -88,15 +88,7 @@ func (m *Repository) AboutHandler(w http.ResponseWriter, r *http.Request) {
 
 // LoginHandler - for getting the login page
 func (m *Repository) LoginHandler(w http.ResponseWriter, r *http.Request) {
-	//strMap := make(map[string]string)
-	//render.RenderTemplate(w, r, "login.page.tmpl", &models.PageData{StrMap: strMap})
 	pd := m.AddCSRFData(&models.PageData{}, r)
-
-	//token := nosurf.Token(r)
-	//data := map[string]interface{}{
-	//	"CSRFToken": token,
-	//}
-	//log.Println(data["CSRFToken"])
 
 	err := m.App.UITemplates.ExecuteTemplate(w, "login.page.tmpl", &models.PageData{
 		CSRFToken:       pd.CSRFToken,
@@ -109,8 +101,6 @@ func (m *Repository) LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 // PageHandler - for getting the individual pages
 func (m *Repository) PageHandler(w http.ResponseWriter, r *http.Request) {
-	//strMap := make(map[string]string)
-	//render.RenderTemplate(w, r, "page.page.tmpl", &models.PageData{StrMap: strMap})
 	err := m.App.UITemplates.ExecuteTemplate(w, "page.page.tmpl", &models.PageData{})
 	if err != nil {
 		return
@@ -229,9 +219,6 @@ func (m *Repository) ArticleReceived(w http.ResponseWriter, r *http.Request) {
 
 // PostLoginHandler - for getting the individual pages
 func (m *Repository) PostLoginHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("here")
-
-	//strMap := make(map[string]string)
 	_ = m.App.Session.RenewToken(r.Context())
 	err := r.ParseForm()
 	if err != nil {
@@ -247,9 +234,9 @@ func (m *Repository) PostLoginHandler(w http.ResponseWriter, r *http.Request) {
 	if !form.Valid() {
 		err := m.App.UITemplates.ExecuteTemplate(w, "login.page.tmpl", &models.PageData{Form: form})
 		if err != nil {
+			log.Println(err)
 			return
 		}
-		//render.RenderTemplate(w, r, "login.page.tmpl", &models.PageData{Form: form})
 		return
 	}
 	id, _, err := m.DB.AuthenticateUser(email, password)
@@ -261,11 +248,41 @@ func (m *Repository) PostLoginHandler(w http.ResponseWriter, r *http.Request) {
 	m.App.Session.Put(r.Context(), "user_id", id)
 	m.App.Session.Put(r.Context(), "flash", "Valid Login")
 	http.Redirect(w, r, "/", http.StatusSeeOther)
-	//render.RenderTemplate(w, r, "page.page.tmpl", &models.PageData{StrMap: strMap})
+}
+func (m *Repository) PostAdminLoginHandler(w http.ResponseWriter, r *http.Request) {
+	_ = m.App.Session.RenewToken(r.Context())
+	err := r.ParseForm()
+	if err != nil {
+		log.Fatal(err)
+	}
+	email := r.Form.Get("email")
+	password := r.Form.Get("password")
+
+	form := forms.New(r.PostForm)
+	form.HasRequired("email", "password")
+	form.IsEmail("email")
+
+	if !form.Valid() {
+		err := m.App.UITemplates.ExecuteTemplate(w, "login.page.tmpl", &models.PageData{Form: form})
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		return
+	}
+	id, _, err := m.DB.AuthenticateUser(email, password)
+	if err != nil {
+		m.App.Session.Put(r.Context(), "error", "Invalid Email OR Password")
+		http.Redirect(w, r, "/admin/login", http.StatusSeeOther)
+		return
+	}
+	m.App.Session.Put(r.Context(), "user_id", id)
+	m.App.Session.Put(r.Context(), "flash", "Valid Login")
+	http.Redirect(w, r, "/admin", http.StatusSeeOther)
 }
 
 func (m *Repository) LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	_ = m.App.Session.Destroy(r.Context())
 	_ = m.App.Session.RenewToken(r.Context())
-	http.Redirect(w, r, "/login", http.StatusSeeOther)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
