@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/cwilliamson29/GoLangBlog/models"
 	"golang.org/x/crypto/bcrypt"
+	"log"
 	"time"
 )
 
@@ -29,7 +30,8 @@ func (m *postgresDBRepo) GetUserById(id int) (models.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	query := `SELECT name, email, password, acct_created, last_login, user_type, id FROM users WHERE id = $1`
+	//query := `SELECT name, email, password, user_type, id FROM users WHERE id = ?`
+	query := `SELECT name, email, password, acct_created, last_login, user_type, id FROM users WHERE id = ?`
 
 	row := m.DB.QueryRowContext(ctx, query, id)
 
@@ -44,6 +46,7 @@ func (m *postgresDBRepo) GetUserById(id int) (models.User, error) {
 		&u.ID,
 	)
 	if err != nil {
+		log.Println(err)
 		return u, err
 	}
 	return u, err
@@ -76,17 +79,17 @@ func (m *postgresDBRepo) AuthenticateUser(email string, password string) (int, s
 	var id int
 	var hashedPW string
 
-	query := `SELECT id, password FROM users WHERE email=$1`
+	query := `SELECT id, password FROM users WHERE email=?`
 
 	row := m.DB.QueryRowContext(ctx, query, email)
 
 	err := row.Scan(&id, &hashedPW)
-
 	if err != nil {
+		log.Println(err)
 		return id, "", err
 	}
-
 	err = bcrypt.CompareHashAndPassword([]byte(hashedPW), []byte(password))
+
 	if err == bcrypt.ErrMismatchedHashAndPassword {
 		return 0, "", errors.New("password is incorrect")
 	} else if err != nil {
@@ -116,7 +119,7 @@ func (m *postgresDBRepo) GetBlogPost() (int, int, string, string, error) {
 func (m *postgresDBRepo) Get3BlogPost() (models.ArticleList, error) {
 	var artList models.ArticleList
 
-	rows, err := m.DB.Query("SELECT id, user_id, title, content FROM posts ORDER BY id DESC LIMIT $1", 3)
+	rows, err := m.DB.Query("SELECT id, user_id, title, content FROM posts ORDER BY id DESC LIMIT 3")
 	if err != nil {
 		panic(err)
 	}

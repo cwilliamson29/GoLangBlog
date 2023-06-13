@@ -21,8 +21,10 @@ func (m *Repository) IsAdmin(w http.ResponseWriter, r *http.Request) (bool, erro
 		}
 	} else {
 		uid := m.App.Session.Get(r.Context(), "user_id").(int)
+
 		u, _ := m.DB.GetUserById(uid)
 
+		//log.Println("user: ", u.UserType)
 		if u.UserType != 3 {
 			//log.Println("user_type: ", u.UserType, "and bool: ", u.UserType == 3)
 			// Check if user is admin
