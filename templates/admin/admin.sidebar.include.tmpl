@@ -2,34 +2,43 @@
     <nav id="sidebarMenu" class="collapse d-lg-block sidebar collapse bg-white">
         <div class="position-sticky">
             <div class="list-group list-group-flush mx-3 mt-4">
-                <a href="/admin" class="list-group-item list-group-item-action py-2 ripple active" aria-current="true">
+                <a href="/admin"
+                   class="list-group-item list-group-item-action py-2 ripple {{if eq .Active "home"}}active{{end}}"
+                   aria-current="true">
                     <i class="fas fa-tachometer-alt fa-fw me-3"></i><span>Main dashboard</span>
                 </a>
 
-                <a href="/admin" class="list-group-item list-group-item-action py-2 ripple inactive">
+                <a href="/admin/users"
+                   class="list-group-item list-group-item-action py-2 ripple {{if eq .Active "users"}}active{{end}}">
                     <i class="fas fa-users fa-fw me-3"></i><span>Users</span>
                 </a>
 
-                <a href="/admin" class="list-group-item list-group-item-action py-2 ripple">
+                <a href="/admin"
+                   class="list-group-item list-group-item-action py-2 ripple {{if eq .Active "menu"}}active{{end}}">
                     <i class="fas fa-dice-d6 fa-fw me-3"></i><span>Menu</span>
                 </a>
 
-                <a href="/admin" class="list-group-item list-group-item-action py-2 ripple">
+                <a href="/admin"
+                   class="list-group-item list-group-item-action py-2 ripple {{if eq .Active "categories"}}active{{end}}">
                     <i class="fas fa-pen-nib fa-fw me-3"></i><span>Categories</span>
                 </a>
-                <a href="/admin" class="list-group-item list-group-item-action py-2 ripple">
+                <a href="/admin"
+                   class="list-group-item list-group-item-action py-2 ripple {{if eq .Active "mPosts"}}active{{end}}">
                     <i class="fas fa-blog fa-fw me-3"></i><span>Manage Posts</span>
                 </a>
 
-                <a href="/admin" class="list-group-item list-group-item-action py-2 ripple">
+                <a href="/admin"
+                   class="list-group-item list-group-item-action py-2 ripple {{if eq .Active "cPosts"}}active{{end}}">
                     <i class="fas fa-square-plus fa-fw me-3"></i><span>Create Posts</span>
                 </a>
 
-                <a href="/admin" class="list-group-item list-group-item-action py-2 ripple">
+                <a href="/admin"
+                   class="list-group-item list-group-item-action py-2 ripple {{if eq .Active "settings"}}active{{end}}">
                     <i class="fas fa-gears fa-fw me-3"></i><span>Site Settings</span>
                 </a>
 
-                <a href="/admin" class="list-group-item list-group-item-action py-2 ripple">
+                <a href="/admin"
+                   class="list-group-item list-group-item-action py-2 ripple {{if eq .Active "stats"}}active{{end}}">
                     <i class="fas fa-tram fa-fw me-3"></i><span>Site Statistics</span>
                 </a>
             </div>

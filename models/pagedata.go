@@ -15,5 +15,6 @@ type PageData struct {
 	Error           string
 	Form            *forms.Form
 	Data            map[string]interface{}
+	Active          string
 	IsAuthenticated int
 }

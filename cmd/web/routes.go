@@ -27,11 +27,14 @@ func routes(app *config.AppConfig) http.Handler {
 	mux.Get("/article-received", handlers.Repo.ArticleReceived)
 	mux.Get("/page", handlers.Repo.PageHandler)
 
-	// ADMIN routes
+	// ADMIN routes GET
 	mux.Get("/admin", handlers.Repo.AdminHandler)
 	mux.Get("/admin/login", handlers.Repo.AdminLoginHandler)
-	mux.Post("/admin/login", handlers.Repo.PostAdminLoginHandler)
 	mux.Get("/admin/logout", handlers.Repo.LogoutHandler)
+	mux.Get("/admin/users", handlers.Repo.AdminUsersHandler)
+
+	// ADMIN routes POST
+	mux.Post("/admin/login", handlers.Repo.PostAdminLoginHandler)
 
 	fileServer := http.FileServer(http.Dir("./templates/"))
 	mux.Handle("/static/*", http.StripPrefix("/static", fileServer))

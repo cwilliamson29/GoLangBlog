@@ -30,10 +30,11 @@ func (m *Repository) AdminHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 
-	if uAdmin == true {
+	if uAdmin {
 		err := m.App.AdminTemplates.ExecuteTemplate(w, "admin.home.page.tmpl", &models.PageData{
 			CSRFToken:       pd.CSRFToken,
 			IsAuthenticated: pd.IsAuthenticated,
+			Active:          "home",
 		})
 		if err != nil {
 			log.Println(err)
@@ -41,4 +42,26 @@ func (m *Repository) AdminHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+}
+
+func (m *Repository) AdminUsersHandler(w http.ResponseWriter, r *http.Request) {
+	pd := m.AddCSRFData(&models.PageData{}, r)
+
+	// Check if user logged in
+	uAdmin, err := m.IsAdmin(w, r)
+	if err != nil {
+		log.Println(err)
+	}
+
+	if uAdmin {
+		err := m.App.AdminTemplates.ExecuteTemplate(w, "admin.users.page.tmpl", &models.PageData{
+			CSRFToken:       pd.CSRFToken,
+			IsAuthenticated: pd.IsAuthenticated,
+			Active:          "users",
+		})
+		if err != nil {
+			log.Println(err)
+			return
+		}
+	}
 }
