@@ -48,22 +48,15 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 
 	pd := m.AddCSRFData(&models.PageData{}, r)
 
-	var artList models.ArticleList
+	var artList map[int]interface{}
 	artList, err := m.DB.Get3BlogPost()
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	//for i := range artList.Content {
-	//	fmt.Println(artList.Content[i])
-	//}
 
-	//m.App.Session.Put(r.Context(), "userid", "cwilliamson")
-	data := make(map[string]interface{})
-
-	data["articleList"] = artList
 	err = m.App.UITemplates.ExecuteTemplate(w, "home.page.tmpl", &models.PageData{
-		Data:            data,
+		Data:            artList,
 		CSRFToken:       pd.CSRFToken,
 		IsAuthenticated: pd.IsAuthenticated,
 	})
@@ -126,8 +119,8 @@ func (m *Repository) MakePostHandler(w http.ResponseWriter, r *http.Request) {
 	//	IsAuthenticated: pd.IsAuthenticated,
 	//})
 	err := m.App.UITemplates.ExecuteTemplate(w, "make-post.page.tmpl", &models.PageData{
-		Form:            forms.New(nil),
-		Data:            data,
+		Form: forms.New(nil),
+		//Data:            data,
 		CSRFToken:       pd.CSRFToken,
 		IsAuthenticated: pd.IsAuthenticated,
 	})
@@ -170,8 +163,8 @@ func (m *Repository) PostMakePostHandler(w http.ResponseWriter, r *http.Request)
 		//	Data: data,
 		//})
 		err := m.App.UITemplates.ExecuteTemplate(w, "make-post.page.tmpl", &models.PageData{
-			Form:            form,
-			Data:            data,
+			Form: form,
+			//Data:            data,
 			CSRFToken:       pd.CSRFToken,
 			IsAuthenticated: pd.IsAuthenticated,
 		})
@@ -208,7 +201,7 @@ func (m *Repository) ArticleReceived(w http.ResponseWriter, r *http.Request) {
 	//	Data: data,
 	//})
 	err := m.App.UITemplates.ExecuteTemplate(w, "article-received.page.tmpl", &models.PageData{
-		Data:            data,
+		//Data:            data,
 		CSRFToken:       pd.CSRFToken,
 		IsAuthenticated: pd.IsAuthenticated,
 	})

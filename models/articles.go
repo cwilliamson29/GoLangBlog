@@ -8,8 +8,12 @@ type Article struct {
 }
 
 type ArticleList struct {
-	ID      []int
-	UserID  []int
-	Title   []string
-	Content []string
+	//ID      []int
+	//UserID  []int
+	//Title   []string
+	//Content []string
+	ID      int
+	UserID  int
+	Title   string
+	Content string
 }

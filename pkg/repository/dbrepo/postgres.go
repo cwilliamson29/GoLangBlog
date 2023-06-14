@@ -59,13 +59,18 @@ func (m *postgresDBRepo) AddUser(u models.User) error {
 
 	findQuery := `SELECT email FROM users WHERE email = ?`
 	row := m.DB.QueryRowContext(ctx, findQuery, u.Email)
+	var emCheck interface{}
+	err1 := row.Scan(&emCheck)
 
 	query := `INSERT INTO users(name, email, password, user_type, acct_created, last_login) VALUES(?, ?, ?, ?, ?, ?)`
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
-	if err != nil {
-		log.Println(err)
+	hashedPassword, err2 := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
+	if err2 != nil {
+		log.Println(err2)
 	}
-	if row != nil {
+	log.Println("row: ", row)
+	log.Println(row == nil)
+
+	if err1 != nil {
 		_, err := m.DB.ExecContext(ctx, query, u.Name, u.Email, hashedPassword, u.UserType, time.Now(), time.Now())
 		if err != nil {
 			return err
@@ -144,8 +149,9 @@ func (m *postgresDBRepo) GetBlogPost() (int, int, string, string, error) {
 	return id, uID, aTitle, aContent, nil
 }
 
-func (m *postgresDBRepo) Get3BlogPost() (models.ArticleList, error) {
+func (m *postgresDBRepo) Get3BlogPost() (map[int]interface{}, error) {
 	var artList models.ArticleList
+	artCollection := make(map[int]interface{})
 
 	rows, err := m.DB.Query("SELECT id, user_id, title, content FROM posts ORDER BY id DESC LIMIT 3")
 	if err != nil {
@@ -159,14 +165,46 @@ func (m *postgresDBRepo) Get3BlogPost() (models.ArticleList, error) {
 		if err != nil {
 			panic(err)
 		}
-		artList.ID = append(artList.ID, id)
-		artList.UserID = append(artList.UserID, uID)
-		artList.Title = append(artList.Title, title)
-		artList.Content = append(artList.Content, content)
+
+		artList.ID = id
+		artList.UserID = uID
+		artList.Title = title
+		artList.Content = content
+		artCollection[id] = artList
 	}
 	err = rows.Err()
 	if err != nil {
 		panic(err)
 	}
-	return artList, nil
+	return artCollection, nil
+}
+
+func (m *postgresDBRepo) GetAllUsers() (map[int]interface{}, error) {
+	var user models.User
+	userCollection := make(map[int]interface{})
+	rows, err := m.DB.Query("SELECT name, email, user_type, id FROM users ORDER BY id DESC")
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var id, uT int
+		var name, email string
+		err = rows.Scan(&name, &email, &uT, &id)
+		if err != nil {
+			panic(err)
+		}
+
+		user.ID = id
+		user.Name = name
+		user.Email = email
+		user.UserType = uT
+		userCollection[id] = user
+
+	}
+	err = rows.Err()
+	if err != nil {
+		panic(err)
+	}
+	return userCollection, nil
 }

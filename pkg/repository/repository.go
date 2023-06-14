@@ -9,5 +9,5 @@ type DatabaseRepo interface {
 	UpdateUser(u models.User) error
 	GetUserById(id int) (models.User, error)
 	GetBlogPost() (int, int, string, string, error)
-	Get3BlogPost() (models.ArticleList, error)
+	Get3BlogPost() (map[int]interface{}, error)
 }

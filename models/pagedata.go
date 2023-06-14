@@ -12,9 +12,11 @@ type PageData struct {
 	DataMap         map[string]interface{}
 	CSRFToken       string
 	Warning         string
-	Error           string
+	Error           error
+	Success         string
+	UserAdd         map[string]interface{}
 	Form            *forms.Form
-	Data            map[string]interface{}
+	Data            map[int]interface{}
 	Active          string
 	IsAuthenticated int
 }

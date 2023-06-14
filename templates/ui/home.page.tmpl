@@ -9,15 +9,10 @@
         <div class="col-md-8">
             <!-- Content Here -->
             <article class="blog-post">
-                {{$res := index .Data "articleList"}}
-                <h2 class="blog-post-title mb-1">{{index $res.Title 0}}</h2>
-                <p>{{index $res.Content 0}}</p>
-
-                <h2 class="blog-post-title mb-1">{{index $res.Title 1}}</h2>
-                <p>{{index $res.Content 1}}</p>
-
-                <h2 class="blog-post-title mb-1">{{index $res.Title 2}}</h2>
-                <p>{{index $res.Content 2}}</p>
+                {{ range $key, $value := .Data}}
+                    <h2 class="blog-post-title mb-1" id="{{$key}}">{{$value.Title}}</h2>
+                    <p>{{$value.Content}}</p>
+                {{end}}
             </article>
             <!-- ------------ -->
         </div>

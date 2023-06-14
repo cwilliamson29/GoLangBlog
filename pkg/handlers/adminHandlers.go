@@ -69,7 +69,7 @@ func (m *Repository) AdminUsersHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (m *Repository) PostUserCreateHandler(w http.ResponseWriter, r *http.Request) {
-	//pd := m.AddCSRFData(&models.PageData{}, r)
+	pd := m.AddCSRFData(&models.PageData{}, r)
 	// Check if user logged in
 	uAdmin, err := m.IsAdmin(w, r)
 	if err != nil {
@@ -83,14 +83,13 @@ func (m *Repository) PostUserCreateHandler(w http.ResponseWriter, r *http.Reques
 			return
 		}
 		ut, _ := strconv.Atoi(r.Form.Get("user_type"))
-		log.Println("ut is: ", ut)
 		createUser := models.User{
 			Name:     r.Form.Get("name"),
 			Email:    r.Form.Get("email"),
 			Password: r.Form.Get("password"),
 			UserType: ut,
 		}
-		log.Printf("name: %d, Email: %d, password: %d, userType: %d \n", createUser.Name, createUser.Email, createUser.Password, createUser.UserType)
+		//log.Printf("name: %d, Email: %d, password: %d, userType: %d \n", createUser.Name, createUser.Email, createUser.Password, createUser.UserType)
 
 		form := forms.New(r.PostForm)
 
@@ -98,15 +97,27 @@ func (m *Repository) PostUserCreateHandler(w http.ResponseWriter, r *http.Reques
 		form.MinLength("name", 5, r)
 		form.MinLength("password", 5, r)
 		form.IsEmail("password")
+		userAdd := make(map[string]interface{})
 
 		// Write to the DB
 		err = m.DB.AddUser(createUser)
 		if err != nil {
-			log.Fatal(err)
+			userAdd["error"] = err
+		} else {
+			userAdd["success"] = "User Added Successfully"
 		}
 
 		// Redirect back to users
-		http.Redirect(w, r, "/admin/users", http.StatusSeeOther)
+		err2 := m.App.AdminTemplates.ExecuteTemplate(w, "admin.users.page.tmpl", &models.PageData{
+			CSRFToken:       pd.CSRFToken,
+			IsAuthenticated: pd.IsAuthenticated,
+			Active:          "users",
+			UserAdd:         userAdd,
+		})
+		if err2 != nil {
+			log.Println(err)
+			return
+		}
 	} else {
 		log.Println("entered else")
 		http.Redirect(w, r, "/", http.StatusSeeOther)

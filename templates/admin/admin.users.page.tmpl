@@ -56,6 +56,16 @@
                             </div>
                             <div class="row">
                                 <div class="col-12 mt-3 text-center">
+                                    {{with .UserAdd.error}}
+                                        <label class="text-danger">{{.}}</label>
+                                    {{end}}
+                                </div>
+                                <div class="col-12 mt-3 text-center">
+                                    {{with .UserAdd.success}}
+                                        <label class="text-success">{{.}}</label>
+                                    {{end}}
+                                </div>
+                                <div class="col-12 mt-3 text-center">
                                     <button class="w-50 btn btn-lg btn-primary" type="submit">Create User</button>
                                 </div>
                             </div>
@@ -66,6 +76,59 @@
             </div>
 
 
+        </div>
+        <div class="row mt-3">
+            <div class="col-sm-10 col-md-10 col-lg-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-light">
+                        <h3>Delete/Ban User</h3>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="/admin/user/create">
+                            <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+                            <div class="row">
+                                <div class="col-3 text-end">
+                                    <label for="">User Email:</label>
+                                </div>
+                                <div class="col-9">
+                                    <select name="user_type" id="user_type">
+                                        <option value="1">1 - User</option>
+                                        <option value="2">2 - Moderator</option>
+                                        <option value="3">3 - Admin</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-3 text-end">
+                                    <label for="">What Type:</label>
+                                </div>
+                                <div class="col-9">
+                                    <select name="user_type" id="user_type">
+                                        <option value="delete">Delete User</option>
+                                        <option value="ban">Ban User</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 mt-3 text-center">
+                                    {{with .Error}}
+                                        <label class="text-danger">{{.}}</label>
+                                    {{end}}
+                                </div>
+                                <div class="col-12 mt-3 text-center">
+                                    {{with .Success}}
+                                        <label class="text-success">{{.}}</label>
+                                    {{end}}
+                                </div>
+                                <div class="col-12 mt-3 text-center">
+                                    <button class="w-50 btn btn-lg btn-primary" type="submit">Delete/Ban User</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
         </div>
         <!----------------------->
     </div>
