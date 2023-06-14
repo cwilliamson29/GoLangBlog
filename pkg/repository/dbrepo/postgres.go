@@ -52,6 +52,34 @@ func (m *postgresDBRepo) GetUserById(id int) (models.User, error) {
 	return u, err
 }
 
+// AddUser - Addes a user to the database
+func (m *postgresDBRepo) AddUser(u models.User) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	findQuery := `SELECT email FROM users WHERE email = ?`
+	row := m.DB.QueryRowContext(ctx, findQuery, u.Email)
+
+	query := `INSERT INTO users(name, email, password, user_type, acct_created, last_login) VALUES(?, ?, ?, ?, ?, ?)`
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
+	if err != nil {
+		log.Println(err)
+	}
+	if row != nil {
+		_, err := m.DB.ExecContext(ctx, query, u.Name, u.Email, hashedPassword, u.UserType, time.Now(), time.Now())
+		if err != nil {
+			return err
+		}
+		return nil
+	} else {
+
+		return errors.New("user already exists")
+	}
+	//log.Println("value of row: ", row)
+	//
+	//return nil
+}
+
 // UpdateUser - Updates a user in the database
 func (m *postgresDBRepo) UpdateUser(u models.User) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

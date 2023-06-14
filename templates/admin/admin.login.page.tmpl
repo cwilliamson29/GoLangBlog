@@ -3,12 +3,12 @@
 {{template "headerInclude" .}}
 <body>
 
-<main style="margin-top: 58px">
-    <div class="container pt-4">
-        <!-- Content goes here -->
 
-        <main class="form-signin w-100 m-auto">
+<div class="container pt-4">
+    <!-- Content goes here -->
 
+    <div class="form-signin row justify-content-center align-items-center">
+        <div class=" col-md-6 col-lg-4">
             <form method="post" action="/admin/login">
 
                 <!-- Utilize CSRF token -->
@@ -34,11 +34,11 @@
                 <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
                 <p class="mt-5 mb-3 text-muted">&copy; 2017–2022</p>
             </form>
-        </main>
-
-        <!----------------------->
+        </div>
     </div>
-</main>
+
+    <!----------------------->
+</div>
 
 {{template "footerInclude" .}}
 </body>

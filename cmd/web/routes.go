@@ -17,15 +17,18 @@ func routes(app *config.AppConfig) http.Handler {
 	mux.Use(NoSurf)
 	mux.Use(SetupSession)
 
+	// Site Routes GET
 	mux.Get("/", handlers.Repo.HomeHandler)
 	mux.Get("/about", handlers.Repo.AboutHandler)
 	mux.Get("/login", handlers.Repo.LoginHandler)
 	mux.Get("/logout", handlers.Repo.LogoutHandler)
-	mux.Post("/login", handlers.Repo.PostLoginHandler)
 	mux.Get("/makepost", handlers.Repo.MakePostHandler)
-	mux.Post("/makepost", handlers.Repo.PostMakePostHandler)
 	mux.Get("/article-received", handlers.Repo.ArticleReceived)
 	mux.Get("/page", handlers.Repo.PageHandler)
+
+	// Site Routes POST
+	mux.Post("/makepost", handlers.Repo.PostMakePostHandler)
+	mux.Post("/login", handlers.Repo.PostLoginHandler)
 
 	// ADMIN routes GET
 	mux.Get("/admin", handlers.Repo.AdminHandler)
@@ -35,6 +38,7 @@ func routes(app *config.AppConfig) http.Handler {
 
 	// ADMIN routes POST
 	mux.Post("/admin/login", handlers.Repo.PostAdminLoginHandler)
+	mux.Post("/admin/user/create", handlers.Repo.PostUserCreateHandler)
 
 	fileServer := http.FileServer(http.Dir("./templates/"))
 	mux.Handle("/static/*", http.StripPrefix("/static", fileServer))

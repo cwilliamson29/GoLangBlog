@@ -2,8 +2,10 @@ package handlers
 
 import (
 	"github.com/cwilliamson29/GoLangBlog/models"
+	"github.com/cwilliamson29/GoLangBlog/pkg/forms"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 // User type 1 - normal user
@@ -29,7 +31,7 @@ func (m *Repository) AdminHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-
+	// Check if user is admin
 	if uAdmin {
 		err := m.App.AdminTemplates.ExecuteTemplate(w, "admin.home.page.tmpl", &models.PageData{
 			CSRFToken:       pd.CSRFToken,
@@ -52,7 +54,7 @@ func (m *Repository) AdminUsersHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-
+	// Check if user is admin
 	if uAdmin {
 		err := m.App.AdminTemplates.ExecuteTemplate(w, "admin.users.page.tmpl", &models.PageData{
 			CSRFToken:       pd.CSRFToken,
@@ -63,5 +65,51 @@ func (m *Repository) AdminUsersHandler(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 			return
 		}
+	}
+}
+
+func (m *Repository) PostUserCreateHandler(w http.ResponseWriter, r *http.Request) {
+	//pd := m.AddCSRFData(&models.PageData{}, r)
+	// Check if user logged in
+	uAdmin, err := m.IsAdmin(w, r)
+	if err != nil {
+		log.Println(err)
+	}
+	// Check if user is admin
+	if uAdmin {
+		err := r.ParseForm()
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		ut, _ := strconv.Atoi(r.Form.Get("user_type"))
+		log.Println("ut is: ", ut)
+		createUser := models.User{
+			Name:     r.Form.Get("name"),
+			Email:    r.Form.Get("email"),
+			Password: r.Form.Get("password"),
+			UserType: ut,
+		}
+		log.Printf("name: %d, Email: %d, password: %d, userType: %d \n", createUser.Name, createUser.Email, createUser.Password, createUser.UserType)
+
+		form := forms.New(r.PostForm)
+
+		form.HasRequired("name", "email", "password")
+		form.MinLength("name", 5, r)
+		form.MinLength("password", 5, r)
+		form.IsEmail("password")
+
+		// Write to the DB
+		err = m.DB.AddUser(createUser)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// Redirect back to users
+		http.Redirect(w, r, "/admin/users", http.StatusSeeOther)
+	} else {
+		log.Println("entered else")
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+
 	}
 }
