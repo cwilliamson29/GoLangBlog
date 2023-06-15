@@ -13,27 +13,27 @@ import (
 // User type 3 - admin user
 
 // LoginHandler - for getting the login page
-func (m *Repository) AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
+func (b *BHandlers) AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 	//strMap := make(map[string]string)
 	//render.RenderUnauthorizedTemplate(w, r, "authorizeLogin.page.tmpl", &models.PageData{StrMap: strMap})
-	err := m.App.UITemplates.ExecuteTemplate(w, "authorizeLogin.page.tmpl", &models.PageData{})
+	err := b.App.UITemplates.ExecuteTemplate(w, "authorizeLogin.page.tmpl", &models.PageData{})
 	if err != nil {
 		return
 	}
 }
 
 // AdminHandler - for getting the admin page
-func (m *Repository) AdminHandler(w http.ResponseWriter, r *http.Request) {
-	pd := m.AddCSRFData(&models.PageData{}, r)
+func (b *BHandlers) AdminHandler(w http.ResponseWriter, r *http.Request) {
+	pd := b.AddCSRFData(&models.PageData{}, r)
 
 	// Check if user logged in
-	uAdmin, err := m.IsAdmin(w, r)
+	uAdmin, err := b.IsAdmin(w, r)
 	if err != nil {
 		log.Println(err)
 	}
 	// Check if user is admin
 	if uAdmin {
-		err := m.App.AdminTemplates.ExecuteTemplate(w, "admin.home.page.tmpl", &models.PageData{
+		err := b.App.AdminTemplates.ExecuteTemplate(w, "admin.home.page.tmpl", &models.PageData{
 			CSRFToken:       pd.CSRFToken,
 			IsAuthenticated: pd.IsAuthenticated,
 			Active:          "home",
@@ -46,17 +46,17 @@ func (m *Repository) AdminHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (m *Repository) AdminUsersHandler(w http.ResponseWriter, r *http.Request) {
-	pd := m.AddCSRFData(&models.PageData{}, r)
+func (b *BHandlers) AdminUsersHandler(w http.ResponseWriter, r *http.Request) {
+	pd := b.AddCSRFData(&models.PageData{}, r)
 
 	// Check if user logged in
-	uAdmin, err := m.IsAdmin(w, r)
+	uAdmin, err := b.IsAdmin(w, r)
 	if err != nil {
 		log.Println(err)
 	}
 	// Check if user is admin
 	if uAdmin {
-		err := m.App.AdminTemplates.ExecuteTemplate(w, "admin.users.page.tmpl", &models.PageData{
+		err := b.App.AdminTemplates.ExecuteTemplate(w, "admin.users.page.tmpl", &models.PageData{
 			CSRFToken:       pd.CSRFToken,
 			IsAuthenticated: pd.IsAuthenticated,
 			Active:          "users",
@@ -68,10 +68,10 @@ func (m *Repository) AdminUsersHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (m *Repository) PostUserCreateHandler(w http.ResponseWriter, r *http.Request) {
-	pd := m.AddCSRFData(&models.PageData{}, r)
+func (b *BHandlers) PostUserCreateHandler(w http.ResponseWriter, r *http.Request) {
+	pd := b.AddCSRFData(&models.PageData{}, r)
 	// Check if user logged in
-	uAdmin, err := m.IsAdmin(w, r)
+	uAdmin, err := b.IsAdmin(w, r)
 	if err != nil {
 		log.Println(err)
 	}
@@ -100,7 +100,7 @@ func (m *Repository) PostUserCreateHandler(w http.ResponseWriter, r *http.Reques
 		userAdd := make(map[string]interface{})
 
 		// Write to the DB
-		err = m.DB.AddUser(createUser)
+		err = b.DB.AddUser(createUser)
 		if err != nil {
 			userAdd["error"] = err
 		} else {
@@ -108,7 +108,7 @@ func (m *Repository) PostUserCreateHandler(w http.ResponseWriter, r *http.Reques
 		}
 
 		// Redirect back to users
-		err2 := m.App.AdminTemplates.ExecuteTemplate(w, "admin.users.page.tmpl", &models.PageData{
+		err2 := b.App.AdminTemplates.ExecuteTemplate(w, "admin.users.page.tmpl", &models.PageData{
 			CSRFToken:       pd.CSRFToken,
 			IsAuthenticated: pd.IsAuthenticated,
 			Active:          "users",

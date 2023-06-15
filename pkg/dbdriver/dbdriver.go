@@ -2,6 +2,7 @@ package dbdriver
 
 import (
 	"database/sql"
+	"log"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -23,6 +24,7 @@ const maxDbLifetime = 5 * time.Minute
 func NewDatabase(dsn string) (*sql.DB, error) {
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 
@@ -34,6 +36,7 @@ func NewDatabase(dsn string) (*sql.DB, error) {
 
 	err = db.Ping()
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 	return db, nil
@@ -42,7 +45,7 @@ func NewDatabase(dsn string) (*sql.DB, error) {
 func ConnectSQL(dsn string) (*DB, error) {
 	db, err := NewDatabase(dsn)
 	if err != nil {
-		panic(err)
+		log.Println(err)
 	}
 	db.SetMaxOpenConns(maxOpenDbConns)
 	db.SetConnMaxIdleTime(maxIdleDbConns)

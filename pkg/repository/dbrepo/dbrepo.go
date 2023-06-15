@@ -6,14 +6,25 @@ import (
 	"github.com/cwilliamson29/GoLangBlog/pkg/repository"
 )
 
-type postgresDBRepo struct {
-	App *config.AppConfig
-	DB  *sql.DB
+type MySqlDB struct {
+	App       *config.AppConfig
+	DB        *sql.DB
+	User      string
+	Password  string
+	Host      string
+	Database  string
+	ParseTime string
+	err       error
 }
 
-func NewPostGresRepo(conn *sql.DB, ac *config.AppConfig) repository.DatabaseRepo {
-	return &postgresDBRepo{
-		App: ac,
-		DB:  conn,
+func NewSQLRepo(conn *sql.DB, ac *config.AppConfig) repository.DatabaseRepo {
+	return &MySqlDB{
+		App:       ac,
+		DB:        conn,
+		User:      User,
+		Password:  Password,
+		Host:      Host,
+		Database:  Database,
+		ParseTime: ParseTime,
 	}
 }

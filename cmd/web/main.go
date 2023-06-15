@@ -33,10 +33,9 @@ func main() {
 	app.AdminTemplates = template.Must(template.ParseGlob("./templates/admin/*.tmpl"))
 	app.UITemplates = template.Must(template.ParseGlob("./templates/ui/*.tmpl"))
 
-	//db, err := dbdriver.ConnectSQL("host=localhost port=5432 dbname=blog_db user=postgres password=TurtleDove")
 	db, err := dbdriver.ConnectSQL(DbConnection)
 	if err != nil {
-		log.Fatal("cant connect to db: ", err)
+		log.Println("cant connect to db: ", err)
 	}
 
 	repo := handlers.NewRepo(&app, db)
