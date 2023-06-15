@@ -2,11 +2,11 @@ package dbrepo
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"github.com/cwilliamson29/GoLangBlog/models"
 	"golang.org/x/crypto/bcrypt"
 	"log"
+	"strconv"
 	"time"
 )
 
@@ -40,76 +40,33 @@ func (m *MySqlDB) InsertPost(newPost models.Post) error {
 
 // GetUserById - Get a user from the database
 func (m *MySqlDB) GetUserById(id int) (models.User, error) {
-	//ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	//defer cancel()
-
-	//query2 := "select count(*) from users "
-
-	//var args []any
-
-	//m.Test(query2, args)
-
-	//query := `SELECT name, email, password, user_type, id FROM users WHERE id = ?`
-
-	var results DbRow
-
+	var results *DbRow
 	query := `SELECT name, email, password, acct_created, last_login, user_type, id FROM users WHERE id = ?`
 
-	qGet, err := m.DB.Prepare(query)
-	if err != nil {
-		log.Println(err)
-	} else {
-		defer qGet.Close()
-		rows, err := qGet.Query(id)
-		if err != nil {
-			log.Println(err)
-		} else {
-			defer rows.Close()
-			col, err := rows.Columns()
-			if err == nil {
-				results.Column = col
-				rowValues := make([]sql.RawBytes, len(col))
-				scanArgs := make([]any, len(rowValues))
-				for i := range rowValues {
-					scanArgs[i] = &rowValues[i]
-				}
-				for rows.Next() {
-					rows.Scan(scanArgs...)
-					for _, cols := range rowValues {
-						var value string
-						if cols == nil {
-							value = "NULL"
-						} else {
-							value = string(cols)
-						}
-						results.Row = append(results.Row, value)
-					}
-				}
-			}
-		}
-
+	ct := m.Connect()
+	if ct {
+		results = m.Get(query, id)
+	}
+	cl := m.Close()
+	if !cl {
+		log.Println("db not closed")
 	}
 
-	//row := m.DB.QueryRowContext(ctx, query, id)
-	//
 	var u models.User
+	ac, _ := time.Parse("Mon Jan 2 15:04:05 -0700 MST 2006", results.Row[3])
+	ll, _ := time.Parse("Mon Jan 2 15:04:05 -0700 MST 2006", results.Row[4])
+	ut, _ := strconv.Atoi(results.Row[5])
+	uId, _ := strconv.Atoi(results.Row[6])
 
-	u.Name = results.Column[0]
-	u.Email = results.Column[1]
-	u.Password = results.Column[2]
-	u.AcctCreated = results.Column[3]
-	u.LastLogin = results.Column[4]
-	ut := results.Column[5].(int)
+	u.Name = results.Row[0]
+	u.Email = results.Row[1]
+	u.Password = results.Row[2]
+	u.AcctCreated = ac
+	u.LastLogin = ll
 	u.UserType = ut
-	u.ID = results.Column[6]
+	u.ID = uId
 
-	//if err != nil {
-	//	log.Println(err)
-	//	return u, err
-	//}
-	//return u, err
-	log.Println(u)
-	return u, err
+	return u, nil
 }
 
 // AddUser - Addes a user to the database

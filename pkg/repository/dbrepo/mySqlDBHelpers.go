@@ -36,3 +36,42 @@ func (m *MySqlDB) Close() bool {
 	}
 	return rtn
 }
+
+func (m *MySqlDB) Get(query string, args ...any) *DbRow {
+	var results DbRow
+	qGet, err := m.DB.Prepare(query)
+	if err != nil {
+		log.Println(err)
+	} else {
+		defer qGet.Close()
+		rows, err := qGet.Query(args...)
+		if err != nil {
+			log.Println(err)
+		} else {
+			defer rows.Close()
+			col, err := rows.Columns()
+			if err == nil {
+				results.Column = col
+				rowValues := make([]sql.RawBytes, len(col))
+				scanArgs := make([]any, len(rowValues))
+				for i := range rowValues {
+					scanArgs[i] = &rowValues[i]
+				}
+				for rows.Next() {
+					rows.Scan(scanArgs...)
+					for _, cols := range rowValues {
+						var value string
+						if cols == nil {
+							value = "NULL"
+						} else {
+							value = string(cols)
+						}
+						results.Row = append(results.Row, value)
+					}
+				}
+			}
+		}
+
+	}
+	return &results
+}
