@@ -1,4 +1,4 @@
-package dbrepo
+package db
 
 import (
 	"context"
@@ -39,17 +39,13 @@ func (m *MySqlDB) InsertPost(newPost models.Post) error {
 //}
 
 // GetUserById - Get a user from the database
-func (m *MySqlDB) GetUserById(id int) (models.User, error) {
+func (m *MySqlDB) GetUserById(id int) (*models.User, error) {
 	var results *DbRow
 	query := `SELECT name, email, password, acct_created, last_login, user_type, id FROM users WHERE id = ?`
 
 	ct := m.Connect()
 	if ct {
 		results = m.Get(query, id)
-	}
-	cl := m.Close()
-	if !cl {
-		log.Println("db not closed")
 	}
 
 	var u models.User
@@ -66,7 +62,7 @@ func (m *MySqlDB) GetUserById(id int) (models.User, error) {
 	u.UserType = ut
 	u.ID = uId
 
-	return u, nil
+	return &u, nil
 }
 
 // AddUser - Addes a user to the database

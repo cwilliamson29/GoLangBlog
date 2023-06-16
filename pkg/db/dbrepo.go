@@ -1,9 +1,8 @@
-package dbrepo
+package db
 
 import (
 	"database/sql"
 	"github.com/cwilliamson29/GoLangBlog/pkg/config"
-	"github.com/cwilliamson29/GoLangBlog/pkg/repository"
 )
 
 type MySqlDB struct {
@@ -17,7 +16,7 @@ type MySqlDB struct {
 	err       error
 }
 
-func NewSQLRepo(conn *sql.DB, ac *config.AppConfig) repository.DatabaseRepo {
+func NewSQLRepo(conn *sql.DB, ac *config.AppConfig) DatabaseRepo {
 	return &MySqlDB{
 		App:       ac,
 		DB:        conn,
