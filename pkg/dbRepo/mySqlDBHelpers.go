@@ -1,4 +1,4 @@
-package db
+package dbRepo
 
 import (
 	"database/sql"
@@ -37,7 +37,7 @@ func (m *MySqlDB) Close() bool {
 	return rtn
 }
 
-// Get - Get method for assisting in db function
+// Get - Get method for assisting in dbRepo function
 func (m *MySqlDB) Get(query string, args ...any) *DbRow {
 	var results DbRow
 	qGet, err := m.DB.Prepare(query)

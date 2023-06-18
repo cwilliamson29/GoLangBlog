@@ -1,4 +1,4 @@
-package db
+package dbRepo
 
 import "github.com/cwilliamson29/GoLangBlog/models"
 

@@ -6,9 +6,6 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
-	//_ "github.com/jackc/pgx/pgconn
-	_ "github.com/jackc/pgx/v5"
-	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 type DB struct {

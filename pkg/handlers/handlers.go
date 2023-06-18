@@ -3,7 +3,7 @@ package handlers
 import (
 	"github.com/cwilliamson29/GoLangBlog/models"
 	"github.com/cwilliamson29/GoLangBlog/pkg/config"
-	"github.com/cwilliamson29/GoLangBlog/pkg/db"
+	"github.com/cwilliamson29/GoLangBlog/pkg/dbRepo"
 	"github.com/cwilliamson29/GoLangBlog/pkg/dbdriver"
 	"github.com/cwilliamson29/GoLangBlog/pkg/forms"
 	"github.com/justinas/nosurf"
@@ -13,9 +13,7 @@ import (
 
 type BHandlers struct {
 	App *config.AppConfig
-	DB  db.DatabaseRepo
-	//AdminTemplates *template.Template
-	//UITemplates    *template.Template
+	DB  dbRepo.DatabaseRepo
 }
 
 var Repo *BHandlers
@@ -23,7 +21,7 @@ var Repo *BHandlers
 func NewRepo(ac *config.AppConfig, db *dbdriver.DB) *BHandlers {
 	return &BHandlers{
 		App: ac,
-		DB:  db.NewSQLRepo(db.SQL, ac),
+		DB:  dbRepo.NewSQLRepo(db.SQL, ac),
 	}
 }
 

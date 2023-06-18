@@ -1,6 +1,7 @@
-package main
+package routes
 
 import (
+	middleware2 "github.com/cwilliamson29/GoLangBlog/middleware"
 	"github.com/cwilliamson29/GoLangBlog/pkg/config"
 	"github.com/cwilliamson29/GoLangBlog/pkg/handlers"
 	"github.com/go-chi/chi/v5"
@@ -8,14 +9,14 @@ import (
 	"net/http"
 )
 
-func routes(app *config.AppConfig) http.Handler {
+func Router(app *config.AppConfig) http.Handler {
 	mux := chi.NewRouter()
 	mux.Use(middleware.Logger)
 	mux.Use(middleware.Recoverer)
-	mux.Use(LogRequestInfo)
+	mux.Use(middleware2.LogRequestInfo)
 
-	mux.Use(NoSurf)
-	mux.Use(SetupSession)
+	mux.Use(middleware2.NoSurf)
+	mux.Use(middleware2.SetupSession)
 
 	// Site Routes GET
 	mux.Get("/", handlers.Repo.HomeHandler)
