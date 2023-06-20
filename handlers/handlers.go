@@ -1,27 +1,35 @@
 package handlers
 
 import (
+	"github.com/alexedwards/scs/v2"
 	"github.com/cwilliamson29/GoLangBlog/models"
-	"github.com/cwilliamson29/GoLangBlog/pkg/config"
 	"github.com/cwilliamson29/GoLangBlog/pkg/dbRepo"
 	"github.com/cwilliamson29/GoLangBlog/pkg/dbdriver"
 	"github.com/cwilliamson29/GoLangBlog/pkg/forms"
-	"github.com/justinas/nosurf"
+	"html/template"
 	"log"
 	"net/http"
 )
 
 type BHandlers struct {
-	App *config.AppConfig
-	DB  dbRepo.DatabaseRepo
+	User           models.User
+	DB             dbRepo.DatabaseRepo
+	InfoLog        *log.Logger
+	Session        *scs.SessionManager
+	CSRFToken      string
+	AdminTemplates *template.Template
+	UITemplates    *template.Template
 }
 
 var Repo *BHandlers
 
-func NewRepo(ac *config.AppConfig, db *dbdriver.DB) *BHandlers {
+// ac *config.AppConfig,
+func NewRepo(db *dbdriver.DB, at *template.Template, ui *template.Template, ses *scs.SessionManager) *BHandlers {
 	return &BHandlers{
-		App: ac,
-		DB:  dbRepo.NewSQLRepo(db.SQL, ac),
+		DB:             dbRepo.NewSQLRepo(db.SQL),
+		Session:        ses,
+		AdminTemplates: at,
+		UITemplates:    ui,
 	}
 }
 
@@ -29,10 +37,8 @@ func NewHandlers(r *BHandlers) {
 	Repo = r
 }
 
-func (b *BHandlers) AddCSRFData(pd *models.PageData, r *http.Request) *models.PageData {
-	pd.CSRFToken = nosurf.Token(r)
-
-	if b.App.Session.Exists(r.Context(), "user_id") {
+func (b *BHandlers) UserExists(pd *models.PageData, r *http.Request) *models.PageData {
+	if b.Session.Exists(r.Context(), "user_id") {
 		pd.IsAuthenticated = 1
 	}
 	return pd
@@ -40,10 +46,7 @@ func (b *BHandlers) AddCSRFData(pd *models.PageData, r *http.Request) *models.Pa
 
 // HomeHandler - for getting the home page
 func (b *BHandlers) HomeHandler(w http.ResponseWriter, r *http.Request) {
-	//ut := b.App.Session.Get(r.Context(), "user_type")
-	//log.Println("user type: ", ut)
-
-	pd := b.AddCSRFData(&models.PageData{}, r)
+	pd := b.UserExists(&models.PageData{}, r)
 
 	var artList map[int]interface{}
 	artList, err := b.DB.Get3BlogPost()
@@ -52,9 +55,8 @@ func (b *BHandlers) HomeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = b.App.UITemplates.ExecuteTemplate(w, "home.page.tmpl", &models.PageData{
+	err = b.UITemplates.ExecuteTemplate(w, "home.page.tmpl", &models.PageData{
 		Data:            artList,
-		CSRFToken:       pd.CSRFToken,
 		IsAuthenticated: pd.IsAuthenticated,
 	})
 	if err != nil {
@@ -64,13 +66,11 @@ func (b *BHandlers) HomeHandler(w http.ResponseWriter, r *http.Request) {
 
 // AboutHandler - for getting the about page
 func (b *BHandlers) AboutHandler(w http.ResponseWriter, r *http.Request) {
-	//strMap := make(map[string]string)
-	//render.RenderTemplate(w, r, "about.page.tmpl", &models.PageData{StrMap: strMap})
-	pd := b.AddCSRFData(&models.PageData{}, r)
+	pd := b.UserExists(&models.PageData{}, r)
 
-	err := b.App.UITemplates.ExecuteTemplate(w, "about.page.tmpl", &models.PageData{
-		CSRFToken:       pd.CSRFToken,
-		IsAuthenticated: pd.IsAuthenticated})
+	err := b.UITemplates.ExecuteTemplate(w, "about.page.tmpl", &models.PageData{
+		IsAuthenticated: pd.IsAuthenticated,
+	})
 	if err != nil {
 		return
 	}
@@ -78,11 +78,11 @@ func (b *BHandlers) AboutHandler(w http.ResponseWriter, r *http.Request) {
 
 // LoginHandler - for getting the login page
 func (b *BHandlers) LoginHandler(w http.ResponseWriter, r *http.Request) {
-	pd := b.AddCSRFData(&models.PageData{}, r)
+	pd := b.UserExists(&models.PageData{}, r)
 
-	err := b.App.UITemplates.ExecuteTemplate(w, "login.page.tmpl", &models.PageData{
-		CSRFToken:       pd.CSRFToken,
-		IsAuthenticated: pd.IsAuthenticated})
+	err := b.UITemplates.ExecuteTemplate(w, "login.page.tmpl", &models.PageData{
+		IsAuthenticated: pd.IsAuthenticated,
+	})
 	if err != nil {
 		http.Error(w, "unable to execute the template", http.StatusInternalServerError)
 		return
@@ -91,7 +91,7 @@ func (b *BHandlers) LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 // PageHandler - for getting the individual pages
 func (b *BHandlers) PageHandler(w http.ResponseWriter, r *http.Request) {
-	err := b.App.UITemplates.ExecuteTemplate(w, "page.page.tmpl", &models.PageData{})
+	err := b.UITemplates.ExecuteTemplate(w, "page.page.tmpl", &models.PageData{})
 	if err != nil {
 		return
 	}
@@ -100,11 +100,11 @@ func (b *BHandlers) PageHandler(w http.ResponseWriter, r *http.Request) {
 
 // MakePostHandler - for creating new posts
 func (b *BHandlers) MakePostHandler(w http.ResponseWriter, r *http.Request) {
-	pd := b.AddCSRFData(&models.PageData{}, r)
+	//pd := b.AddCSRFData(&models.PageData{}, r)
 
-	if !b.App.Session.Exists(r.Context(), "user_id") {
-		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
-	}
+	//if !b.Session.Exists(r.Context(), "user_id") {
+	//	http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
+	//}
 	var emptyArticle models.Article
 	data := make(map[string]interface{})
 	data["article"] = emptyArticle
@@ -115,11 +115,11 @@ func (b *BHandlers) MakePostHandler(w http.ResponseWriter, r *http.Request) {
 	//	CSRFToken:       pd.CSRFToken,
 	//	IsAuthenticated: pd.IsAuthenticated,
 	//})
-	err := b.App.UITemplates.ExecuteTemplate(w, "make-post.page.tmpl", &models.PageData{
+	err := b.UITemplates.ExecuteTemplate(w, "make-post.page.tmpl", &models.PageData{
 		Form: forms.New(nil),
 		//Data:            data,
-		CSRFToken:       pd.CSRFToken,
-		IsAuthenticated: pd.IsAuthenticated,
+		//CSRFToken:       pd.CSRFToken,
+		//IsAuthenticated: pd.IsAuthenticated,
 	})
 	if err != nil {
 		return
@@ -129,7 +129,7 @@ func (b *BHandlers) MakePostHandler(w http.ResponseWriter, r *http.Request) {
 
 // PostMakePostHandler - Post method for submitting new posts
 func (b *BHandlers) PostMakePostHandler(w http.ResponseWriter, r *http.Request) {
-	pd := b.AddCSRFData(&models.PageData{}, r)
+	//pd := b.AddCSRFData(&models.PageData{}, r)
 
 	err := r.ParseForm()
 	if err != nil {
@@ -137,11 +137,11 @@ func (b *BHandlers) PostMakePostHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	uID := (b.App.Session.Get(r.Context(), "user_id")).(int)
+	//uID := (b.Session.Get(r.Context(), "user_id")).(int)
 	article := models.Post{
 		Title:   r.Form.Get("blog_title"),
 		Content: r.Form.Get("blog_article"),
-		UserID:  int(uID),
+		//UserID:  int(uID),
 	}
 
 	form := forms.New(r.PostForm)
@@ -154,16 +154,11 @@ func (b *BHandlers) PostMakePostHandler(w http.ResponseWriter, r *http.Request) 
 	if !form.Valid() {
 		data := make(map[string]interface{})
 		data["article"] = article
-
-		//render.RenderTemplate(w, r, "make-post.page.tmpl", &models.PageData{
-		//	Form: form,
-		//	Data: data,
-		//})
-		err := b.App.UITemplates.ExecuteTemplate(w, "make-post.page.tmpl", &models.PageData{
+		err := b.UITemplates.ExecuteTemplate(w, "make-post.page.tmpl", &models.PageData{
 			Form: form,
 			//Data:            data,
-			CSRFToken:       pd.CSRFToken,
-			IsAuthenticated: pd.IsAuthenticated,
+			//CSRFToken:       pd.CSRFToken,
+			//IsAuthenticated: pd.IsAuthenticated,
 		})
 		if err != nil {
 			return
@@ -176,31 +171,31 @@ func (b *BHandlers) PostMakePostHandler(w http.ResponseWriter, r *http.Request) 
 		log.Fatal(err)
 	}
 
-	b.App.Session.Put(r.Context(), "article", article)
+	//b.Session.Put(r.Context(), "article", article)
 	http.Redirect(w, r, "/article-received", http.StatusSeeOther)
 }
 
 // ArticleReceived - get article
 func (b *BHandlers) ArticleReceived(w http.ResponseWriter, r *http.Request) {
-	pd := b.AddCSRFData(&models.PageData{}, r)
+	//pd := b.AddCSRFData(&models.PageData{}, r)
 
-	article, ok := b.App.Session.Get(r.Context(), "article").(models.Article)
-	if !ok {
-		log.Println("Cant get data from session")
-		b.App.Session.Put(r.Context(), "error", "Cant get data from session")
-		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
-		return
-	}
-	data := make(map[string]interface{})
-	data["article"] = article
+	//article, ok := b.App.Session.Get(r.Context(), "article").(models.Article)
+	//if !ok {
+	//	log.Println("Cant get data from session")
+	//	b.App.Session.Put(r.Context(), "error", "Cant get data from session")
+	//	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	//	return
+	//}
+	//data := make(map[string]interface{})
+	//data["article"] = article
 
 	//render.RenderTemplate(w, r, "article-received.page.tmpl", &models.PageData{
 	//	Data: data,
 	//})
-	err := b.App.UITemplates.ExecuteTemplate(w, "article-received.page.tmpl", &models.PageData{
+	err := b.UITemplates.ExecuteTemplate(w, "article-received.page.tmpl", &models.PageData{
 		//Data:            data,
-		CSRFToken:       pd.CSRFToken,
-		IsAuthenticated: pd.IsAuthenticated,
+		//CSRFToken:       pd.CSRFToken,
+		//IsAuthenticated: pd.IsAuthenticated,
 	})
 	if err != nil {
 		return
@@ -209,7 +204,7 @@ func (b *BHandlers) ArticleReceived(w http.ResponseWriter, r *http.Request) {
 
 // PostLoginHandler - for getting the individual pages
 func (b *BHandlers) PostLoginHandler(w http.ResponseWriter, r *http.Request) {
-	_ = b.App.Session.RenewToken(r.Context())
+	_ = b.Session.RenewToken(r.Context())
 	err := r.ParseForm()
 	if err != nil {
 		log.Fatal(err)
@@ -222,7 +217,7 @@ func (b *BHandlers) PostLoginHandler(w http.ResponseWriter, r *http.Request) {
 	form.IsEmail("email")
 
 	if !form.Valid() {
-		err := b.App.UITemplates.ExecuteTemplate(w, "login.page.tmpl", &models.PageData{Form: form})
+		err := b.UITemplates.ExecuteTemplate(w, "login.page.tmpl", &models.PageData{Form: form})
 		if err != nil {
 			log.Println(err)
 			return
@@ -231,16 +226,22 @@ func (b *BHandlers) PostLoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	id, _, err := b.DB.AuthenticateUser(email, password)
 	if err != nil {
-		b.App.Session.Put(r.Context(), "error", "Invalid Email OR Password")
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		b.Session.Put(r.Context(), "error", "Invalid Email OR Password")
+		err := b.UITemplates.ExecuteTemplate(w, "login.page.tmpl", &models.PageData{Warning: "Invalid Login"})
+		if err != nil {
+			log.Println(err)
+			return
+		}
 		return
 	}
-	b.App.Session.Put(r.Context(), "user_id", id)
-	b.App.Session.Put(r.Context(), "flash", "Valid Login")
+
+	b.Session.Put(r.Context(), "user_id", id)
+	b.Session.Put(r.Context(), "flash", "Valid Login")
+
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 func (b *BHandlers) PostAdminLoginHandler(w http.ResponseWriter, r *http.Request) {
-	_ = b.App.Session.RenewToken(r.Context())
+	//_ = b.App.Session.RenewToken(r.Context())
 	err := r.ParseForm()
 	if err != nil {
 		log.Fatal(err)
@@ -253,7 +254,7 @@ func (b *BHandlers) PostAdminLoginHandler(w http.ResponseWriter, r *http.Request
 	form.IsEmail("email")
 
 	if !form.Valid() {
-		err := b.App.UITemplates.ExecuteTemplate(w, "login.page.tmpl", &models.PageData{Form: form})
+		err := b.UITemplates.ExecuteTemplate(w, "login.page.tmpl", &models.PageData{Form: form})
 		if err != nil {
 			log.Println(err)
 			return
@@ -262,17 +263,17 @@ func (b *BHandlers) PostAdminLoginHandler(w http.ResponseWriter, r *http.Request
 	}
 	id, _, err := b.DB.AuthenticateUser(email, password)
 	if err != nil {
-		b.App.Session.Put(r.Context(), "error", "Invalid Email OR Password")
+		b.Session.Put(r.Context(), "error", "Invalid Email OR Password")
 		http.Redirect(w, r, "/admin/login", http.StatusSeeOther)
 		return
 	}
-	b.App.Session.Put(r.Context(), "user_id", id)
-	b.App.Session.Put(r.Context(), "flash", "Valid Login")
+	b.Session.Put(r.Context(), "user_id", id)
+	b.Session.Put(r.Context(), "flash", "Valid Login")
 	http.Redirect(w, r, "/admin", http.StatusSeeOther)
 }
 
 func (b *BHandlers) LogoutHandler(w http.ResponseWriter, r *http.Request) {
-	_ = b.App.Session.Destroy(r.Context())
-	_ = b.App.Session.RenewToken(r.Context())
+	_ = b.Session.Destroy(r.Context())
+	_ = b.Session.RenewToken(r.Context())
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

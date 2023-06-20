@@ -3,12 +3,11 @@ package main
 import (
 	"encoding/gob"
 	"github.com/alexedwards/scs/v2"
+	"github.com/cwilliamson29/GoLangBlog/handlers"
 	"github.com/cwilliamson29/GoLangBlog/middleware"
 	"github.com/cwilliamson29/GoLangBlog/models"
-	"github.com/cwilliamson29/GoLangBlog/pkg/config"
 	"github.com/cwilliamson29/GoLangBlog/pkg/dbRepo"
 	"github.com/cwilliamson29/GoLangBlog/pkg/dbdriver"
-	"github.com/cwilliamson29/GoLangBlog/pkg/handlers"
 	"github.com/go-chi/chi/v5"
 	mwc "github.com/go-chi/chi/v5/middleware"
 	"html/template"
@@ -18,7 +17,8 @@ import (
 )
 
 var sessionManager *scs.SessionManager
-var app config.AppConfig
+
+//var app config.AppConfig
 
 func main() {
 	//render.NewAppConfig(&app)
@@ -31,28 +31,23 @@ func main() {
 	sessionManager.Cookie.Persist = true
 	sessionManager.Cookie.Secure = false
 	sessionManager.Cookie.SameSite = http.SameSiteLaxMode
-	app.Session = sessionManager
-
-	app.AdminTemplates = template.Must(template.ParseGlob("./templates/admin/*.tmpl"))
-	app.UITemplates = template.Must(template.ParseGlob("./templates/ui/*.tmpl"))
 
 	db, err := dbdriver.ConnectSQL(dbRepo.DbConnection)
 	if err != nil {
 		log.Println("cant connect to dbRepo: ", err)
 	}
-
-	repo := handlers.NewRepo(&app, db)
-	handlers.NewHandlers(repo)
-
 	defer db.SQL.Close()
+
+	AdminTemplates := template.Must(template.ParseGlob("./templates/admin/*.tmpl"))
+	UITemplates := template.Must(template.ParseGlob("./templates/ui/*.tmpl"))
+
+	repo := handlers.NewRepo(db, AdminTemplates, UITemplates, sessionManager)
+	handlers.NewHandlers(repo)
 
 	router := chi.NewRouter()
 	router.Use(mwc.Logger)
 	router.Use(mwc.Recoverer)
 	router.Use(middleware.LogRequestInfo)
-
-	router.Use(middleware.NoSurf)
-	router.Use(middleware.SetupSession)
 
 	// Site Routes GET
 	router.Get("/", handlers.Repo.HomeHandler)
@@ -82,7 +77,8 @@ func main() {
 
 	port := "8080"
 
-	http.ListenAndServe(":"+port, router)
+	log.Println("Listing on port: ", port)
+	http.ListenAndServe(":"+port, sessionManager.LoadAndSave(router))
 
 	//srv := &http.Server{
 	//	Addr:    ":8080",
@@ -95,7 +91,3 @@ func main() {
 	//}
 
 }
-
-//func run() (*dbdriver.DB, error) {
-//
-//}

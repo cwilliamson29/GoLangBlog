@@ -1,12 +1,12 @@
 package helpers
 
 import (
-	"github.com/cwilliamson29/GoLangBlog/pkg/config"
+	"github.com/cwilliamson29/GoLangBlog/handlers"
 	"log"
 	"net/http"
 )
 
-var app config.AppConfig
+var app *handlers.BHandlers
 
 // User type 1 - normal user
 // User type 2 - moderator user

@@ -1,3 +1,7 @@
+github.com/GolangToolKits/go-secure-cookies v1.0.1 h1:qv+xaROGXofekf3tQR5CAPsPqjH/b2sU0DwSXSWmf4M=
+github.com/GolangToolKits/go-secure-cookies v1.0.1/go.mod h1:1tdoLcLacIoKRhzZ/TRk2dbE1EMeQWeYjYottM9wfLs=
+github.com/GolangToolKits/go-secure-sessions v1.0.4 h1:UCHtWszC6RSVR42iTJhSDJB7Y0u60iFjAMC+jwHoxMg=
+github.com/GolangToolKits/go-secure-sessions v1.0.4/go.mod h1:EwvY8vEKN3FhHfAsK/cxS90nWSlmM9wCjg9rVxbrVyo=
 github.com/alexedwards/scs/v2 v2.5.1 h1:EhAz3Kb3OSQzD8T+Ub23fKsiuvE0GzbF5Lgn0uTwM3Y=
 github.com/alexedwards/scs/v2 v2.5.1/go.mod h1:ToaROZxyKukJKT/xLcVQAChi5k6+Pn1Gvmdl7h3RRj8=
 github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 h1:DklsrG3dyBCFEj5IhUbnKptjxatkF07cF2ak3yi77so=

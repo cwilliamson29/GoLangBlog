@@ -7,12 +7,11 @@ import (
 )
 
 func (b *BHandlers) IsAdmin(w http.ResponseWriter, r *http.Request) (bool, error) {
-	pd := b.AddCSRFData(&models.PageData{}, r)
+	pd := b.UserExists(&models.PageData{}, r)
+
 	// Check if user is admin
-	if !b.App.Session.Exists(r.Context(), "user_id") {
-		//render.RenderUnauthorizedTemplate(w, r, "authorizeLogin.page.tmpl", &models.PageData{})
-		err := b.App.AdminTemplates.ExecuteTemplate(w, "admin.login.page.tmpl", &models.PageData{
-			CSRFToken:       pd.CSRFToken,
+	if !b.Session.Exists(r.Context(), "user_id") {
+		err := b.AdminTemplates.ExecuteTemplate(w, "admin.login.page.tmpl", &models.PageData{
 			IsAuthenticated: pd.IsAuthenticated,
 		})
 		if err != nil {
@@ -20,16 +19,12 @@ func (b *BHandlers) IsAdmin(w http.ResponseWriter, r *http.Request) (bool, error
 			log.Println(err)
 		}
 	} else {
-		uid := b.App.Session.Get(r.Context(), "user_id").(int)
-
+		uid := b.Session.Get(r.Context(), "user_id").(int)
 		u, _ := b.DB.GetUserById(uid)
 
-		//log.Println("user: ", u.UserType)
 		if u.UserType != 3 {
-			//log.Println("user_type: ", u.UserType, "and bool: ", u.UserType == 3)
 			// Check if user is admin
-			err := b.App.AdminTemplates.ExecuteTemplate(w, "unauthorized.page.tmpl", &models.PageData{
-				CSRFToken:       pd.CSRFToken,
+			err := b.AdminTemplates.ExecuteTemplate(w, "unauthorized.page.tmpl", &models.PageData{
 				IsAuthenticated: pd.IsAuthenticated,
 			})
 			if err != nil {

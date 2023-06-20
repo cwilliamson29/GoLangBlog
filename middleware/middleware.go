@@ -2,19 +2,16 @@ package middleware
 
 import (
 	"fmt"
-	"github.com/cwilliamson29/GoLangBlog/pkg/config"
-
-	//"github.com/cwilliamson29/GoLangBlog"
-	//"github.com/alexedwards/scs/v2"
-	//"github.com/cwilliamson29/GoLangBlog"
+	"github.com/cwilliamson29/GoLangBlog/handlers"
 	"github.com/cwilliamson29/GoLangBlog/pkg/helpers"
-	"github.com/justinas/nosurf"
 	"log"
+
 	"net/http"
 	"time"
 )
 
-var app config.AppConfig
+// var app config.AppConfig
+var app *handlers.BHandlers
 
 func LogRequestInfo(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -25,24 +22,25 @@ func LogRequestInfo(next http.Handler) http.Handler {
 	})
 }
 
-func SetupSession(next http.Handler) http.Handler {
-	//return scs.SessionManager.LoadAndSave(next)
-	return app.Session.LoadAndSave(next)
-}
+//func SetupSession(next http.Handler) http.Handler {
+//	//return scs.SessionManager.LoadAndSave(next)
+//	return app.Session.LoadAndSave(next)
+//}
 
-func NoSurf(next http.Handler) http.Handler {
-	noSurfHandler := nosurf.New(next)
-	noSurfHandler.SetBaseCookie(http.Cookie{
-		Name:     "mycsrfcookie",
-		Path:     "/",
-		Domain:   "",
-		Secure:   false,
-		HttpOnly: true,
-		MaxAge:   3600,
-		SameSite: http.SameSiteLaxMode,
-	})
-	return noSurfHandler
-}
+//
+//func NoSurf(next http.Handler) http.Handler {
+//	noSurfHandler := nosurf.New(next)
+//	noSurfHandler.SetBaseCookie(http.Cookie{
+//		Name:     "mycsrfcookie",
+//		Path:     "/",
+//		Domain:   "",
+//		Secure:   false,
+//		HttpOnly: true,
+//		MaxAge:   3600,
+//		SameSite: http.SameSiteLaxMode,
+//	})
+//	return noSurfHandler
+//}
 
 func Authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

@@ -2,11 +2,10 @@ package dbRepo
 
 import (
 	"database/sql"
-	"github.com/cwilliamson29/GoLangBlog/pkg/config"
 )
 
 type MySqlDB struct {
-	App       *config.AppConfig
+	//App       *config.AppConfig
 	DB        *sql.DB
 	User      string
 	Password  string
@@ -16,9 +15,10 @@ type MySqlDB struct {
 	err       error
 }
 
-func NewSQLRepo(conn *sql.DB, ac *config.AppConfig) DatabaseRepo {
+// , ac *config.AppConfig
+func NewSQLRepo(conn *sql.DB) DatabaseRepo {
 	return &MySqlDB{
-		App:       ac,
+		//App:       ac,
 		DB:        conn,
 		User:      User,
 		Password:  Password,
