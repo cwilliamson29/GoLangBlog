@@ -2,10 +2,9 @@ package handlers
 
 import (
 	"github.com/alexedwards/scs/v2"
+	dbRepo2 "github.com/cwilliamson29/GoLangBlog/dbRepo"
+	"github.com/cwilliamson29/GoLangBlog/forms"
 	"github.com/cwilliamson29/GoLangBlog/models"
-	"github.com/cwilliamson29/GoLangBlog/pkg/dbRepo"
-	"github.com/cwilliamson29/GoLangBlog/pkg/dbdriver"
-	"github.com/cwilliamson29/GoLangBlog/pkg/forms"
 	"html/template"
 	"log"
 	"net/http"
@@ -13,7 +12,7 @@ import (
 
 type BHandlers struct {
 	User           models.User
-	DB             dbRepo.DatabaseRepo
+	DB             dbRepo2.DatabaseRepo
 	InfoLog        *log.Logger
 	Session        *scs.SessionManager
 	CSRFToken      string
@@ -24,9 +23,9 @@ type BHandlers struct {
 var Repo *BHandlers
 
 // ac *config.AppConfig,
-func NewRepo(db *dbdriver.DB, at *template.Template, ui *template.Template, ses *scs.SessionManager) *BHandlers {
+func NewRepo(dbc *dbRepo2.MySqlDB, at *template.Template, ui *template.Template, ses *scs.SessionManager) *BHandlers {
 	return &BHandlers{
-		DB:             dbRepo.NewSQLRepo(db.SQL),
+		DB:             dbRepo2.NewSQLRepo(dbc.DB),
 		Session:        ses,
 		AdminTemplates: at,
 		UITemplates:    ui,

@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/cwilliamson29/GoLangBlog/pkg/forms"
+	"github.com/cwilliamson29/GoLangBlog/forms"
 )
 
 type PageData struct {
@@ -10,7 +10,6 @@ type PageData struct {
 	IntMap          map[string]int
 	FltMap          map[string]float32
 	DataMap         map[string]interface{}
-	CSRFToken       string
 	Warning         string
 	Error           error
 	Success         string

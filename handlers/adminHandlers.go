@@ -1,8 +1,8 @@
 package handlers
 
 import (
+	"github.com/cwilliamson29/GoLangBlog/forms"
 	"github.com/cwilliamson29/GoLangBlog/models"
-	"github.com/cwilliamson29/GoLangBlog/pkg/forms"
 	"log"
 	"net/http"
 	"strconv"

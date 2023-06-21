@@ -3,7 +3,7 @@ package middleware
 import (
 	"fmt"
 	"github.com/cwilliamson29/GoLangBlog/handlers"
-	"github.com/cwilliamson29/GoLangBlog/pkg/helpers"
+	"github.com/cwilliamson29/GoLangBlog/helpers"
 	"log"
 
 	"net/http"

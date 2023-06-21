@@ -3,11 +3,10 @@ package main
 import (
 	"encoding/gob"
 	"github.com/alexedwards/scs/v2"
+	"github.com/cwilliamson29/GoLangBlog/dbRepo"
 	"github.com/cwilliamson29/GoLangBlog/handlers"
 	"github.com/cwilliamson29/GoLangBlog/middleware"
 	"github.com/cwilliamson29/GoLangBlog/models"
-	"github.com/cwilliamson29/GoLangBlog/pkg/dbRepo"
-	"github.com/cwilliamson29/GoLangBlog/pkg/dbdriver"
 	"github.com/go-chi/chi/v5"
 	mwc "github.com/go-chi/chi/v5/middleware"
 	"html/template"
@@ -32,16 +31,16 @@ func main() {
 	sessionManager.Cookie.Secure = false
 	sessionManager.Cookie.SameSite = http.SameSiteLaxMode
 
-	db, err := dbdriver.ConnectSQL(dbRepo.DbConnection)
+	dbc, err := dbRepo.ConnectSQL(dbRepo.DbConnection)
 	if err != nil {
 		log.Println("cant connect to dbRepo: ", err)
 	}
-	defer db.SQL.Close()
+	defer dbc.DB.Close()
 
 	AdminTemplates := template.Must(template.ParseGlob("./templates/admin/*.tmpl"))
 	UITemplates := template.Must(template.ParseGlob("./templates/ui/*.tmpl"))
 
-	repo := handlers.NewRepo(db, AdminTemplates, UITemplates, sessionManager)
+	repo := handlers.NewRepo(dbc, AdminTemplates, UITemplates, sessionManager)
 	handlers.NewHandlers(repo)
 
 	router := chi.NewRouter()
