@@ -12,14 +12,6 @@ import (
 // User type 2 - moderator user
 // User type 3 - admin user
 
-// LoginHandler - for getting the login page
-func (b *BHandlers) AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
-	err := b.UITemplates.ExecuteTemplate(w, "authorizeLogin.page.tmpl", &models.PageData{})
-	if err != nil {
-		return
-	}
-}
-
 // AdminHandler - for getting the admin page
 func (b *BHandlers) AdminHandler(w http.ResponseWriter, r *http.Request) {
 	pd := b.UserExists(&models.PageData{}, r)

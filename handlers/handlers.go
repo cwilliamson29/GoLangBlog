@@ -75,19 +75,6 @@ func (b *BHandlers) AboutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// LoginHandler - for getting the login page
-func (b *BHandlers) LoginHandler(w http.ResponseWriter, r *http.Request) {
-	pd := b.UserExists(&models.PageData{}, r)
-
-	err := b.UITemplates.ExecuteTemplate(w, "login.page.tmpl", &models.PageData{
-		IsAuthenticated: pd.IsAuthenticated,
-	})
-	if err != nil {
-		http.Error(w, "unable to execute the template", http.StatusInternalServerError)
-		return
-	}
-}
-
 // PageHandler - for getting the individual pages
 func (b *BHandlers) PageHandler(w http.ResponseWriter, r *http.Request) {
 	err := b.UITemplates.ExecuteTemplate(w, "page.page.tmpl", &models.PageData{})
@@ -199,80 +186,4 @@ func (b *BHandlers) ArticleReceived(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-}
-
-// PostLoginHandler - for getting the individual pages
-func (b *BHandlers) PostLoginHandler(w http.ResponseWriter, r *http.Request) {
-	_ = b.Session.RenewToken(r.Context())
-	err := r.ParseForm()
-	if err != nil {
-		log.Fatal(err)
-	}
-	email := r.Form.Get("email")
-	password := r.Form.Get("password")
-
-	form := forms.New(r.PostForm)
-	form.HasRequired("email", "password")
-	form.IsEmail("email")
-
-	if !form.Valid() {
-		err := b.UITemplates.ExecuteTemplate(w, "login.page.tmpl", &models.PageData{Form: form})
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		return
-	}
-	id, _, err := b.DB.AuthenticateUser(email, password)
-	if err != nil {
-		b.Session.Put(r.Context(), "error", "Invalid Email OR Password")
-		err := b.UITemplates.ExecuteTemplate(w, "login.page.tmpl", &models.PageData{Warning: "Invalid Login"})
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		return
-	}
-
-	b.Session.Put(r.Context(), "user_id", id)
-	b.Session.Put(r.Context(), "flash", "Valid Login")
-
-	http.Redirect(w, r, "/", http.StatusSeeOther)
-}
-func (b *BHandlers) PostAdminLoginHandler(w http.ResponseWriter, r *http.Request) {
-	//_ = b.App.Session.RenewToken(r.Context())
-	err := r.ParseForm()
-	if err != nil {
-		log.Fatal(err)
-	}
-	email := r.Form.Get("email")
-	password := r.Form.Get("password")
-
-	form := forms.New(r.PostForm)
-	form.HasRequired("email", "password")
-	form.IsEmail("email")
-
-	if !form.Valid() {
-		err := b.UITemplates.ExecuteTemplate(w, "login.page.tmpl", &models.PageData{Form: form})
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		return
-	}
-	id, _, err := b.DB.AuthenticateUser(email, password)
-	if err != nil {
-		b.Session.Put(r.Context(), "error", "Invalid Email OR Password")
-		http.Redirect(w, r, "/admin/login", http.StatusSeeOther)
-		return
-	}
-	b.Session.Put(r.Context(), "user_id", id)
-	b.Session.Put(r.Context(), "flash", "Valid Login")
-	http.Redirect(w, r, "/admin", http.StatusSeeOther)
-}
-
-func (b *BHandlers) LogoutHandler(w http.ResponseWriter, r *http.Request) {
-	_ = b.Session.Destroy(r.Context())
-	_ = b.Session.RenewToken(r.Context())
-	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
