@@ -83,16 +83,17 @@
                         <h3>Delete/Ban User</h3>
                     </div>
                     <div class="card-body">
-                        <form method="post" action="/admin/user/create">
+                        <form method="post" action="/admin/user/delete">
                             <div class="row">
                                 <div class="col-3 text-end">
-                                    <label for="">User Email:</label>
+                                    <label for="user_id">Select User</label>
                                 </div>
                                 <div class="col-9">
-                                    <select name="user_type" id="user_type">
-                                        <option value="1">1 - User</option>
-                                        <option value="2">2 - Moderator</option>
-                                        <option value="3">3 - Admin</option>
+                                    <select name="user_id" id="user_id">
+                                        {{ range $key, $value := .Data}}
+                                            <option value="{{$value.ID}}">{{$value.ID}} - {{$value.Name}}
+                                                - {{$value.Email}}</option>
+                                        {{end}}
                                     </select>
                                 </div>
                             </div>
@@ -101,7 +102,7 @@
                                     <label for="">What Type:</label>
                                 </div>
                                 <div class="col-9">
-                                    <select name="user_type" id="user_type">
+                                    <select name="del_type" id="del_type">
                                         <option value="delete">Delete User</option>
                                         <option value="ban">Ban User</option>
                                     </select>
@@ -109,12 +110,12 @@
                             </div>
                             <div class="row">
                                 <div class="col-12 mt-3 text-center">
-                                    {{with .Error}}
+                                    {{with .UserDel.error}}
                                         <label class="text-danger">{{.}}</label>
                                     {{end}}
                                 </div>
                                 <div class="col-12 mt-3 text-center">
-                                    {{with .Success}}
+                                    {{with .UserDel.success}}
                                         <label class="text-success">{{.}}</label>
                                     {{end}}
                                 </div>

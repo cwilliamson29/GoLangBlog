@@ -10,4 +10,6 @@ type DatabaseRepo interface {
 	GetUserById(id int) (*models.User, error)
 	GetBlogPost() (int, int, string, string, error)
 	Get3BlogPost() (map[int]interface{}, error)
+	GetAllUsers() (map[int]interface{}, error)
+	DeleteUser(id int) error
 }

@@ -76,3 +76,27 @@ func (m *MySqlDB) Get(query string, args ...any) *DbRow {
 	}
 	return &results
 }
+
+// Delete Delete
+func (m *MySqlDB) Delete(query string, args ...any) bool {
+	var success = false
+	var stmt *sql.Stmt
+	stmt, m.err = m.DB.Prepare(query)
+	if m.err != nil {
+		log.Println("Error:", m.err.Error())
+	} else {
+		defer stmt.Close()
+		res, err := stmt.Exec(args...)
+		if err != nil {
+			log.Println("Delete Exec err:", err.Error())
+		} else {
+			affectedRows, _ := res.RowsAffected()
+			if affectedRows == 0 {
+				log.Println("Error: No records deleted")
+			} else {
+				success = true
+			}
+		}
+	}
+	return success
+}

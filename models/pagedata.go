@@ -14,6 +14,7 @@ type PageData struct {
 	Error           error
 	Success         string
 	UserAdd         map[string]interface{}
+	UserDel         map[string]any
 	Form            *forms.Form
 	Data            map[int]interface{}
 	Active          string

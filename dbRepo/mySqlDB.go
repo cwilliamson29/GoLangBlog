@@ -17,9 +17,9 @@ func (m *MySqlDB) InsertPost(newPost models.Post) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	query := `INSERT INTO posts(title, content, user_id) VALUES($1, $2, $3)`
+	//query := `INSERT INTO posts(title, content, user_id) VALUES($1, $2, $3)`
 
-	_, err := m.DB.ExecContext(ctx, query, newPost.Title, newPost.Content, newPost.UserID)
+	_, err := m.DB.ExecContext(ctx, queryInsertPost, newPost.Title, newPost.Content, newPost.UserID)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -27,25 +27,12 @@ func (m *MySqlDB) InsertPost(newPost models.Post) error {
 	return nil
 }
 
-// Test Test
-//func (m *MySqlDB) Test(query string, args ...any) bool {
-//	var rtn bool
-//	row := m.Get(query, args...)
-//	if len(row) == 1 {
-//		rtn = true
-//		return rtn
-//	}
-//	return rtn
-//}
-
 // GetUserById - Get a user from the database
 func (m *MySqlDB) GetUserById(id int) (*models.User, error) {
 	var results *DbRow
-	query := `SELECT name, email, password, acct_created, last_login, user_type, id FROM users WHERE id = ?`
-
 	ct := m.Connect()
 	if ct {
-		results = m.Get(query, id)
+		results = m.Get(queryGetUserById, id)
 	}
 
 	var u models.User
@@ -70,12 +57,10 @@ func (m *MySqlDB) AddUser(u models.User) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	findQuery := `SELECT email FROM users WHERE email = ?`
-	row := m.DB.QueryRowContext(ctx, findQuery, u.Email)
+	row := m.DB.QueryRowContext(ctx, queryFindByEmail, u.Email)
 	var emCheck interface{}
 	err1 := row.Scan(&emCheck)
 
-	query := `INSERT INTO users(name, email, password, user_type, acct_created, last_login) VALUES(?, ?, ?, ?, ?, ?)`
 	hashedPassword, err2 := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 	if err2 != nil {
 		log.Println(err2)
@@ -84,7 +69,7 @@ func (m *MySqlDB) AddUser(u models.User) error {
 	log.Println(row == nil)
 
 	if err1 != nil {
-		_, err := m.DB.ExecContext(ctx, query, u.Name, u.Email, hashedPassword, u.UserType, time.Now(), time.Now())
+		_, err := m.DB.ExecContext(ctx, queryAddUser, u.Name, u.Email, hashedPassword, u.UserType, time.Now(), time.Now())
 		if err != nil {
 			return err
 		}
@@ -162,62 +147,57 @@ func (m *MySqlDB) GetBlogPost() (int, int, string, string, error) {
 	return id, uID, aTitle, aContent, nil
 }
 
+// Get3BlogPost - Gets first 3 blog posts out of DB
 func (m *MySqlDB) Get3BlogPost() (map[int]interface{}, error) {
+	var results *DbRow
+	ct := m.Connect()
+	if ct {
+		results = m.Get(queryGet3BlogPosts, 3)
+	}
+
 	var artList models.ArticleList
 	artCollection := make(map[int]interface{})
 
-	rows, err := m.DB.Query("SELECT id, user_id, title, content FROM posts ORDER BY id DESC LIMIT 3")
-	if err != nil {
-		log.Println(err)
-	}
-	defer rows.Close()
-	for rows.Next() {
-		var id, uID int
-		var title, content string
-		err = rows.Scan(&id, &uID, &title, &content)
-		if err != nil {
-			log.Println(err)
-		}
+	for i := 0; i <= 8; {
+		id, _ := strconv.Atoi(results.Row[i])
+		uId, _ := strconv.Atoi(results.Row[i+1])
 
 		artList.ID = id
-		artList.UserID = uID
-		artList.Title = title
-		artList.Content = content
+		artList.UserID = uId
+		artList.Title = results.Row[i+2]
+		artList.Content = results.Row[i+3]
 		artCollection[id] = artList
+
+		i = i + 4
 	}
-	err = rows.Err()
-	if err != nil {
-		log.Println(err)
-	}
+
 	return artCollection, nil
 }
 
 func (m *MySqlDB) GetAllUsers() (map[int]interface{}, error) {
+	var results *DbRow
+	ct := m.Connect()
+	if ct {
+		results = m.Get(queryGetAllUsers)
+	}
+
 	var user models.User
 	userCollection := make(map[int]interface{})
-	rows, err := m.DB.Query("SELECT name, email, user_type, id FROM users ORDER BY id DESC")
-	if err != nil {
-		log.Println(err)
-	}
-	defer rows.Close()
-	for rows.Next() {
-		var id, uT int
-		var name, email string
-		err = rows.Scan(&name, &email, &uT, &id)
-		if err != nil {
-			log.Println(err)
-		}
+
+	count := len(results.Row)
+	c := count - 4
+
+	for i := 0; i <= c; {
+		id, _ := strconv.Atoi(results.Row[i])
+		uT, _ := strconv.Atoi(results.Row[i+3])
 
 		user.ID = id
-		user.Name = name
-		user.Email = email
+		user.Name = results.Row[i+1]
+		user.Email = results.Row[i+2]
 		user.UserType = uT
 		userCollection[id] = user
 
-	}
-	err = rows.Err()
-	if err != nil {
-		log.Println(err)
+		i = i + 4
 	}
 	return userCollection, nil
 }

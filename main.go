@@ -70,6 +70,7 @@ func main() {
 	// ADMIN routes POST
 	router.Post("/admin/login", handlers.Repo.PostAdminLoginHandler)
 	router.Post("/admin/user/create", handlers.Repo.PostUserCreateHandler)
+	router.Post("/admin/user/delete", handlers.Repo.PostUserDeleteHandler)
 
 	fileServer := http.FileServer(http.Dir("./templates/"))
 	router.Handle("/static/*", http.StripPrefix("/static", fileServer))
