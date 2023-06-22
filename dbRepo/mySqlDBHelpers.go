@@ -100,3 +100,51 @@ func (m *MySqlDB) Delete(query string, args ...any) bool {
 	}
 	return success
 }
+
+// Update Update
+func (m *MySqlDB) Update(query string, args ...any) bool {
+	var success = false
+	var stmtUp *sql.Stmt
+	stmtUp, m.err = m.DB.Prepare(query)
+	if m.err != nil {
+		log.Println("Error:", m.err.Error())
+	} else {
+		defer stmtUp.Close()
+		res, err := stmtUp.Exec(args...)
+		if err != nil {
+			log.Println("Update Exec err:", err.Error())
+		} else {
+			affectedRows, _ := res.RowsAffected()
+			if affectedRows == 0 {
+				log.Println("Error: No records updated")
+			} else {
+				success = true
+			}
+		}
+	}
+	return success
+}
+
+// Insert Insert
+func (m *MySqlDB) Insert(query string, args ...any) (bool, int64) {
+	var success = false
+	var id int64 = -1
+	var stmtIns *sql.Stmt
+	stmtIns, m.err = m.DB.Prepare(query)
+	if m.err != nil {
+		log.Println("Error:", m.err.Error())
+	} else {
+		defer stmtIns.Close()
+		res, err := stmtIns.Exec(args...)
+		if err != nil {
+			log.Println("Insert Exec err:", err.Error())
+		} else {
+			id, err = res.LastInsertId()
+			affectedRows, _ := res.RowsAffected()
+			if err == nil && affectedRows > 0 {
+				success = true
+			}
+		}
+	}
+	return success, id
+}

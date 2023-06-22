@@ -92,15 +92,24 @@ func (b *BHandlers) PostUserDeleteHandler(w http.ResponseWriter, r *http.Request
 		delType := r.Form.Get("del_type")
 		uDel := make(map[string]any)
 		// Write to the DB
-		if delType == "delete" {
-			err = b.DB.DeleteUser(uId)
-			if err != nil {
-				uDel["error"] = err
+		if uId != 1 {
+			if delType == "delete" {
+				err = b.DB.DeleteUser(uId)
+				if err != nil {
+					uDel["error"] = err
+				} else {
+					uDel["success"] = "User Deleted Successfully"
+				}
 			} else {
-				uDel["success"] = "User Deleted Successfully"
+				err = b.DB.BanUser(uId)
+				if err != nil {
+					uDel["error"] = err
+				} else {
+					uDel["success"] = "User Banned Successfully"
+				}
 			}
 		} else {
-			uDel["success"] = "User Banned Successfully"
+			uDel["error"] = "Primary user account CANNOT be deleted or banned"
 		}
 
 		var userList map[int]interface{}

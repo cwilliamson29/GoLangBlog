@@ -3,6 +3,7 @@ package dbRepo
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/cwilliamson29/GoLangBlog/models"
 	"golang.org/x/crypto/bcrypt"
 	"log"
@@ -54,33 +55,23 @@ func (m *MySqlDB) GetUserById(id int) (*models.User, error) {
 
 // AddUser - Addes a user to the database
 func (m *MySqlDB) AddUser(u models.User) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
+	var suc bool
+	var id int64
 
-	row := m.DB.QueryRowContext(ctx, queryFindByEmail, u.Email)
-	var emCheck interface{}
-	err1 := row.Scan(&emCheck)
-
-	hashedPassword, err2 := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
-	if err2 != nil {
-		log.Println(err2)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
+	if err != nil {
+		log.Println(err)
 	}
-	log.Println("row: ", row)
-	log.Println(row == nil)
 
-	if err1 != nil {
-		_, err := m.DB.ExecContext(ctx, queryAddUser, u.Name, u.Email, hashedPassword, u.UserType, time.Now(), time.Now())
-		if err != nil {
-			return err
+	ct := m.Connect()
+	if ct {
+		suc, id = m.Insert(queryAddUser, u.Name, u.Email, hashedPassword, u.UserType, time.Now(), time.Now())
+		if !suc {
+			er := fmt.Sprintf("User not added: ", id)
+			return errors.New(er)
 		}
-		return nil
-	} else {
-
-		return errors.New("user already exists")
 	}
-	//log.Println("value of row: ", row)
-	//
-	//return nil
+	return nil
 }
 
 // UpdateUser - Updates a user in the database
@@ -104,22 +95,16 @@ func (m *MySqlDB) UpdateUser(u models.User) error {
 
 // AuthenticateUser - Checks database for user and logs in
 func (m *MySqlDB) AuthenticateUser(email string, password string) (int, string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	var id int
-	var hashedPW string
-
-	query := `SELECT id, password FROM users WHERE email=?`
-
-	row := m.DB.QueryRowContext(ctx, query, email)
-
-	err := row.Scan(&id, &hashedPW)
-	if err != nil {
-		log.Println(err)
-		return id, "", err
+	var results *DbRow
+	ct := m.Connect()
+	if ct {
+		results = m.Get(queryLoginUser, email)
 	}
-	err = bcrypt.CompareHashAndPassword([]byte(hashedPW), []byte(password))
+
+	id, _ := strconv.Atoi(results.Row[0])
+	hashedPW := results.Row[1]
+
+	err := bcrypt.CompareHashAndPassword([]byte(hashedPW), []byte(password))
 
 	if err == bcrypt.ErrMismatchedHashAndPassword {
 		return 0, "", errors.New("password is incorrect")
@@ -174,6 +159,7 @@ func (m *MySqlDB) Get3BlogPost() (map[int]interface{}, error) {
 	return artCollection, nil
 }
 
+// GetAllUsers - Gets a list of all users
 func (m *MySqlDB) GetAllUsers() (map[int]interface{}, error) {
 	var results *DbRow
 	ct := m.Connect()
@@ -200,4 +186,34 @@ func (m *MySqlDB) GetAllUsers() (map[int]interface{}, error) {
 		i = i + 4
 	}
 	return userCollection, nil
+}
+
+// DeleteUser - Deletes user from system
+func (m *MySqlDB) DeleteUser(id int) error {
+	var success bool
+	ct := m.Connect()
+	if ct {
+		success = m.Delete(queryDeleteUser, id)
+	}
+	// check if return true for success
+	if success {
+		return nil
+	} else {
+		return errors.New("user not deleted")
+	}
+}
+
+// BanUser - Bans user from further comments
+func (m *MySqlDB) BanUser(id int) error {
+	var success bool
+	ct := m.Connect()
+	if ct {
+		success = m.Update(queryBanUser, id)
+	}
+	// check if return true for success
+	if success {
+		return nil
+	} else {
+		return errors.New("user not banned")
+	}
 }

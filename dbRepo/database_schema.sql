@@ -6,6 +6,7 @@ CREATE TABLE `users` (
                          `email` varchar(125) NOT NULL,
                          `password` varchar(256) NOT NULL,
                          `user_type` int NOT NULL,
+                         `banned` BOOL DEFAULT 0 NOT NULL;
                          `acct_created` TIMESTAMP NOT NULL,
                          `last_login` TIMESTAMP NOT NULL,
                          PRIMARY KEY (`id`)
@@ -25,6 +26,15 @@ CREATE TABLE `posts` (
                          `category` INT NOT NULL,
                          `sub_category` INT NOT NULL,
                          PRIMARY KEY (`id`)
+);
+
+CREATE TABLE `comments`(
+    `id`  INT NOT NULL AUTO_INCREMENT,
+    `post_id` INT NOT NULL,
+    `user_id` INT NOT NULL,
+    `content` TEXT NOT NULL,
+    `comment_date` TIMESTAMP NOT NULL,
+    PRIMARY KEY (`id`)
 );
 
 CREATE TABLE `category` (
@@ -72,6 +82,10 @@ ALTER TABLE `posts` ADD CONSTRAINT `posts_fk1` FOREIGN KEY (`category`) REFERENC
 
 ALTER TABLE `posts` ADD CONSTRAINT `posts_fk2` FOREIGN KEY (`sub_category`) REFERENCES `sub_category`(`id`);
 
+ALTER TABLE `comments` ADD CONSTRAINT `comments_fk0` FOREIGN KEY (`posts_id`) REFERENCES `posts`(`id`);
+
+ALTER TABLE `comments` ADD CONSTRAINT `comments_fk1` FOREIGN KEY (`users_id`) REFERENCES `users`(`id`);
+
 ALTER TABLE `sub_category` ADD CONSTRAINT `sub_category_fk0` FOREIGN KEY (`parent_category`) REFERENCES `category`(`id`);
 
 ALTER TABLE `single_page` ADD CONSTRAINT `single_page_fk0` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`);
@@ -86,7 +100,8 @@ insert into user_types(type)
 values("admin");
 
 insert into users(name, email, password, acct_created, last_login, user_type)
-values("Chris Williamson", "chris@coderchris.dev", "$2a$12$hEBSoCizHAMXhX3Z2Sb0j./gJB0ojZOsgll4Eq4BijI94vtwxIDJi", NOW(), NOW(), 3);
+-- Password is "TurtleDove"
+values("Admin", "admin@admin.com", "$2a$12$hEBSoCizHAMXhX3Z2Sb0j./gJB0ojZOsgll4Eq4BijI94vtwxIDJi", NOW(), NOW(), 3);
 
 insert into category(name)
 values("main");
