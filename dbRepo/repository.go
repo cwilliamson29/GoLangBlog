@@ -12,5 +12,7 @@ type DatabaseRepo interface {
 	Get3BlogPost() (map[int]interface{}, error)
 	GetAllUsers() (map[int]interface{}, error)
 	DeleteUser(id int) error
-	BanUser(id int) error
+	BanUser(id int, t int) error
+	CateAdd(n string) error
+	GetAllCategories() (map[int]interface{}, error)
 }

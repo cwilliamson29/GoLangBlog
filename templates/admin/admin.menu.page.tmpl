@@ -11,10 +11,10 @@
             <div class="col-sm-10 col-md-10 col-lg-8">
                 <div class="card">
                     <div class="card-header bg-primary text-light">
-                        <h3>Add User</h3>
+                        <h3>Create</h3>
                     </div>
                     <div class="card-body">
-                        <form method="post" action="/admin/user/create">
+                        <form method="post" action="/admin/menu/navbar">
                             <div class="row">
                                 <div class="col-3 text-end">
                                     <label for="name">Name:</label>
@@ -73,63 +73,8 @@
 
                 </div>
             </div>
-
-
         </div>
-        <div class="row mt-3">
-            <div class="col-sm-10 col-md-10 col-lg-8">
-                <div class="card">
-                    <div class="card-header bg-primary text-light">
-                        <h3>Delete/Ban User</h3>
-                    </div>
-                    <div class="card-body">
-                        <form method="post" action="/admin/user/delete">
-                            <div class="row">
-                                <div class="col-3 text-end">
-                                    <label for="user_id">Select User</label>
-                                </div>
-                                <div class="col-9">
-                                    <select name="user_id" id="user_id">
-                                        {{ range $key, $value := .Data}}
-                                            <option value="{{$value.ID}}">{{$value.ID}} - {{$value.Name}}
-                                                - {{$value.Email}} {{if eq $value.Banned 1 }}- [ BANNED ]{{end}}</option>
-                                        {{end}}
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-3 text-end">
-                                    <label for="">What Type:</label>
-                                </div>
-                                <div class="col-9">
-                                    <select name="del_type" id="del_type">
-                                        <option value="delete">Delete User</option>
-                                        <option value="ban">Ban User</option>
-                                        <option value="unban">Unban User</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-12 mt-3 text-center">
-                                    {{with .UserDel.error}}
-                                        <label class="text-danger">{{.}}</label>
-                                    {{end}}
-                                </div>
-                                <div class="col-12 mt-3 text-center">
-                                    {{with .UserDel.success}}
-                                        <label class="text-success">{{.}}</label>
-                                    {{end}}
-                                </div>
-                                <div class="col-12 mt-3 text-center">
-                                    <button class="w-50 btn btn-lg btn-primary" type="submit">Delete/Ban User</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
 
-                </div>
-            </div>
-        </div>
         <!----------------------->
     </div>
 </main>

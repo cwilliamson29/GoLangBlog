@@ -100,12 +100,19 @@ func (b *BHandlers) PostUserDeleteHandler(w http.ResponseWriter, r *http.Request
 				} else {
 					uDel["success"] = "User Deleted Successfully"
 				}
-			} else {
-				err = b.DB.BanUser(uId)
+			} else if delType == "ban" {
+				err = b.DB.BanUser(uId, 1)
 				if err != nil {
 					uDel["error"] = err
 				} else {
 					uDel["success"] = "User Banned Successfully"
+				}
+			} else if delType == "unban" {
+				err = b.DB.BanUser(uId, 0)
+				if err != nil {
+					uDel["error"] = err
+				} else {
+					uDel["success"] = "User Un-banned Successfully"
 				}
 			}
 		} else {
@@ -124,6 +131,51 @@ func (b *BHandlers) PostUserDeleteHandler(w http.ResponseWriter, r *http.Request
 			Data:            userList,
 			Active:          "users",
 			UserDel:         uDel,
+		})
+		if err2 != nil {
+			log.Println(err)
+			return
+		}
+	}
+}
+
+func (b *BHandlers) PostCategoryAddHandler(w http.ResponseWriter, r *http.Request) {
+	pd := b.UserExists(&models.PageData{}, r)
+
+	// Check if user logged in
+	uAdmin, err := b.IsAdmin(w, r)
+	if err != nil {
+		log.Println(err)
+	}
+	// Check if user is admin
+	if uAdmin {
+		err = r.ParseForm()
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		n := r.Form.Get("name")
+		cAdd := make(map[string]any)
+		// Write to the DB
+		err = b.DB.CateAdd(n)
+		if err != nil {
+			cAdd["error"] = err
+		} else {
+			cAdd["success"] = "Category Added Successfully"
+		}
+
+		var cgList map[int]interface{}
+		cgList, err = b.DB.GetAllCategories()
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		// Redirect back to users
+		err2 := b.AdminTemplates.ExecuteTemplate(w, "admin.category.page.tmpl", &models.PageData{
+			IsAuthenticated: pd.IsAuthenticated,
+			Data:            cgList,
+			Active:          "users",
+			CateAdd:         cAdd,
 		})
 		if err2 != nil {
 			log.Println(err)

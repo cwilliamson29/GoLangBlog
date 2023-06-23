@@ -62,3 +62,60 @@ func (b *BHandlers) AdminUsersHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
+func (b *BHandlers) AdminMenuHandler(w http.ResponseWriter, r *http.Request) {
+	pd := b.UserExists(&models.PageData{}, r)
+
+	// Check if user logged in
+	uAdmin, err := b.IsAdmin(w, r)
+	if err != nil {
+		log.Println(err)
+	}
+
+	// Check if user is admin
+	if uAdmin {
+		//var userList map[int]interface{}
+		//userList, err := b.DB.GetAllUsers()
+		//if err != nil {
+		//	log.Println(err)
+		//	return
+		//}
+
+		err = b.AdminTemplates.ExecuteTemplate(w, "admin.menu.page.tmpl", &models.PageData{
+			IsAuthenticated: pd.IsAuthenticated,
+			Active:          "menu",
+		})
+		if err != nil {
+			log.Println(err)
+			return
+		}
+	}
+}
+func (b *BHandlers) AdminCategoryHandler(w http.ResponseWriter, r *http.Request) {
+	pd := b.UserExists(&models.PageData{}, r)
+
+	// Check if user logged in
+	uAdmin, err := b.IsAdmin(w, r)
+	if err != nil {
+		log.Println(err)
+	}
+
+	// Check if user is admin
+	if uAdmin {
+		//var userList map[int]interface{}
+		//userList, err := b.DB.GetAllUsers()
+		//if err != nil {
+		//	log.Println(err)
+		//	return
+		//}
+
+		err = b.AdminTemplates.ExecuteTemplate(w, "admin.category.page.tmpl", &models.PageData{
+			IsAuthenticated: pd.IsAuthenticated,
+			//Data:            userList,
+			Active: "categories",
+		})
+		if err != nil {
+			log.Println(err)
+			return
+		}
+	}
+}

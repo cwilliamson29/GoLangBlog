@@ -55,15 +55,22 @@ func (m *MySqlDB) GetUserById(id int) (*models.User, error) {
 
 // AddUser - Addes a user to the database
 func (m *MySqlDB) AddUser(u models.User) error {
+	var exists *DbRow
 	var suc bool
 	var id int64
-
+	ct := m.Connect()
+	if ct {
+		exists = m.Get(queryFindByEmail, u.Email)
+		if len(exists.Row) != 0 {
+			er := fmt.Sprintf("User not added: %s, already exists", exists.Row[0])
+			return errors.New(er)
+		}
+	}
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 	if err != nil {
 		log.Println(err)
 	}
 
-	ct := m.Connect()
 	if ct {
 		suc, id = m.Insert(queryAddUser, u.Name, u.Email, hashedPassword, u.UserType, time.Now(), time.Now())
 		if !suc {
@@ -171,19 +178,21 @@ func (m *MySqlDB) GetAllUsers() (map[int]interface{}, error) {
 	userCollection := make(map[int]interface{})
 
 	count := len(results.Row)
-	c := count - 4
+	c := count - 5
 
 	for i := 0; i <= c; {
 		id, _ := strconv.Atoi(results.Row[i])
 		uT, _ := strconv.Atoi(results.Row[i+3])
+		b, _ := strconv.Atoi(results.Row[i+4])
 
 		user.ID = id
 		user.Name = results.Row[i+1]
 		user.Email = results.Row[i+2]
 		user.UserType = uT
+		user.Banned = b
 		userCollection[id] = user
 
-		i = i + 4
+		i = i + 5
 	}
 	return userCollection, nil
 }
@@ -204,11 +213,11 @@ func (m *MySqlDB) DeleteUser(id int) error {
 }
 
 // BanUser - Bans user from further comments
-func (m *MySqlDB) BanUser(id int) error {
+func (m *MySqlDB) BanUser(id int, t int) error {
 	var success bool
 	ct := m.Connect()
 	if ct {
-		success = m.Update(queryBanUser, id)
+		success = m.Update(queryBanUser, t, id)
 	}
 	// check if return true for success
 	if success {
@@ -216,4 +225,45 @@ func (m *MySqlDB) BanUser(id int) error {
 	} else {
 		return errors.New("user not banned")
 	}
+}
+
+// CateAdd - Creates category title
+func (m *MySqlDB) CateAdd(n string) error {
+	var success bool
+	ct := m.Connect()
+	if ct {
+		success, _ = m.Insert(queryCateAdd, n)
+	}
+	// check if return true for success
+	if success {
+		return nil
+	} else {
+		return errors.New("user not banned")
+	}
+}
+
+// GetAllUsers - Gets a list of all users
+func (m *MySqlDB) GetAllCategories() (map[int]interface{}, error) {
+	var results *DbRow
+	ct := m.Connect()
+	if ct {
+		results = m.Get(queryCateGetAll)
+	}
+
+	var cat models.Category
+	cCollection := make(map[int]interface{})
+
+	count := len(results.Row)
+	c := count - 2
+
+	for i := 0; i <= c; {
+		id, _ := strconv.Atoi(results.Row[i])
+
+		cat.ID = id
+		cat.Name = results.Row[i+1]
+		cCollection[id] = cat
+
+		i = i + 2
+	}
+	return cCollection, nil
 }

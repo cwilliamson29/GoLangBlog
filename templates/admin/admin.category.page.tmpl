@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+{{template "headerInclude" .}}
+<body>
+{{template "adminSidebar" .}}
+{{template "adminNavbar" .}}
+<main style="margin-top: 58px">
+    <div class="container pt-4">
+        <!-- Content goes here -->
+        <div class="row">
+            <div class="col-sm-10 col-md-10 col-lg-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-light">
+                        <h3>Add A Category</h3>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="/admin/category/add">
+                            <div class="row">
+                                <div class="col-3 text-end">
+                                    <label for="name">Category Name:</label>
+                                </div>
+                                <div class="col-9">
+                                    <input type="text" class="form-control" id="name" name="name"
+                                           placeholder="Italian Food">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12 mt-3 text-center">
+                                    {{with .CateAdd.error}}
+                                        <label class="text-danger">{{.}}</label>
+                                    {{end}}
+                                </div>
+                                <div class="col-12 mt-3 text-center">
+                                    {{with .CateAdd.success}}
+                                        <label class="text-success">{{.}}</label>
+                                    {{end}}
+                                </div>
+                                <div class="col-12 mt-3 text-center">
+                                    <button class="w-50 btn btn-lg btn-primary" type="submit">Create Category</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!----------------------->
+    </div>
+</main>
+
+{{template "footerInclude" .}}
+</body>
+</html>

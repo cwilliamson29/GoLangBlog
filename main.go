@@ -66,11 +66,14 @@ func main() {
 	router.Get("/admin/login", handlers.Repo.AdminLoginHandler)
 	router.Get("/admin/logout", handlers.Repo.LogoutHandler)
 	router.Get("/admin/users", handlers.Repo.AdminUsersHandler)
+	router.Get("/admin/menu", handlers.Repo.AdminMenuHandler)
+	router.Get("/admin/category", handlers.Repo.AdminCategoryHandler)
 
 	// ADMIN routes POST
 	router.Post("/admin/login", handlers.Repo.PostAdminLoginHandler)
 	router.Post("/admin/user/create", handlers.Repo.PostUserCreateHandler)
 	router.Post("/admin/user/delete", handlers.Repo.PostUserDeleteHandler)
+	router.Post("/admin/category/add", handlers.Repo.PostCategoryAddHandler)
 
 	fileServer := http.FileServer(http.Dir("./templates/"))
 	router.Handle("/static/*", http.StripPrefix("/static", fileServer))

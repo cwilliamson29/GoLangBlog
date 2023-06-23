@@ -15,6 +15,10 @@ type PageData struct {
 	Success         string
 	UserAdd         map[string]interface{}
 	UserDel         map[string]any
+	CateAdd         map[string]any
+	CateDel         map[string]any
+	SubCateAdd      map[string]any
+	SubCateDel      map[string]any
 	Form            *forms.Form
 	Data            map[int]interface{}
 	Active          string

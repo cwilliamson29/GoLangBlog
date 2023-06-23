@@ -19,13 +19,13 @@ CREATE TABLE `user_types` (
 );
 
 CREATE TABLE `posts` (
-                         `id` INT NOT NULL AUTO_INCREMENT,
-                         `title` varchar(45) NOT NULL,
-                         `content` TEXT NOT NULL,
-                         `user_id` INT NOT NULL,
-                         `category` INT NOT NULL,
-                         `sub_category` INT NOT NULL,
-                         PRIMARY KEY (`id`)
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `title` varchar(45) NOT NULL,
+    `content` TEXT NOT NULL,
+    `user_id` INT NOT NULL,
+    `category` INT NOT NULL,
+    `sub_category` INT NOT NULL,
+    PRIMARY KEY (`id`)
 );
 
 CREATE TABLE `comments`(
@@ -38,43 +38,66 @@ CREATE TABLE `comments`(
 );
 
 CREATE TABLE `category` (
-                            `id` INT NOT NULL AUTO_INCREMENT,
-                            `name` varchar(45) NOT NULL,
-                            PRIMARY KEY (`id`)
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `name` varchar(45) NOT NULL,
+    PRIMARY KEY (`id`)
 );
 
 CREATE TABLE `sub_category` (
-                                `id` INT NOT NULL AUTO_INCREMENT,
-                                `name` varchar(45) NOT NULL,
-                                `parent_category` INT NOT NULL,
-                                PRIMARY KEY (`id`)
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `name` varchar(45) NOT NULL,
+    `parent_category` INT NOT NULL,
+    PRIMARY KEY (`id`)
+);
+
+CREATE TABLE `navbar`(
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `name` varchar(45) NOT NULL,
+    `position` INT NOT NULL,
+    `menu_id` int,
+    `single_page_id` int,
+    PRIMARY KEY (`id`)
 );
 
 CREATE TABLE `menu` (
-                        `id` INT NOT NULL AUTO_INCREMENT,
-                        `name` varchar(45) NOT NULL,
-                        `target` varchar(256) NOT NULL,
-                        PRIMARY KEY (`id`)
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `name` varchar(45) NOT NULL,
+    `target` varchar(256) NOT NULL,
+    PRIMARY KEY (`id`)
+);
+
+CREATE TABLE `menu_item`(
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `name` varchar(45) NOT NULL,
+    `target` varchar(256) NOT NULL,
+    `menu_parent_id` INT NOT NULL,
+    PRIMARY KEY (`id`)
 );
 
 CREATE TABLE `site_settings` (
-                                 `id` INT NOT NULL AUTO_INCREMENT,
-                                 `logo` varchar(256) NOT NULL,
-                                 `brand_logo` varchar(256) NOT NULL,
-                                 `site_name` varchar(125) NOT NULL,
-                                 `site_desc` TEXT NOT NULL,
-                                 PRIMARY KEY (`id`)
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `logo` varchar(256) NOT NULL,
+    `brand_logo` varchar(256) NOT NULL,
+    `site_name` varchar(125) NOT NULL,
+    `site_desc` TEXT NOT NULL,
+    PRIMARY KEY (`id`)
 );
 
 CREATE TABLE `single_page` (
-                               `id` INT NOT NULL AUTO_INCREMENT,
-                               `title` varchar(125) NOT NULL,
-                               `content` TEXT NOT NULL,
-                               `user_id` INT NOT NULL,
-                               PRIMARY KEY (`id`)
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `title` varchar(125) NOT NULL,
+    `content` TEXT NOT NULL,
+    `user_id` INT NOT NULL,
+    PRIMARY KEY (`id`)
 );
 
 ALTER TABLE `users` ADD CONSTRAINT `users_fk0` FOREIGN KEY (`user_type`) REFERENCES `user_types`(`id`);
+
+ALTER TABLE `navbar` ADD CONSTRAINT `navbar_fk0` FOREIGN KEY (`menu_id`) REFERENCES `menu`(`id`);
+
+ALTER TABLE `navbar` ADD CONSTRAINT `navbar_fk1` FOREIGN KEY (`single_page_id`) REFERENCES `single_page`(`id`);
+
+ALTER TABLE `menu_item` ADD CONSTRAINT `menu_item_fk0` FOREIGN KEY (`menu_parent_id`) REFERENCES `menu`(`id`);
 
 ALTER TABLE `posts` ADD CONSTRAINT `posts_fk0` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`);
 
@@ -91,13 +114,12 @@ ALTER TABLE `sub_category` ADD CONSTRAINT `sub_category_fk0` FOREIGN KEY (`paren
 ALTER TABLE `single_page` ADD CONSTRAINT `single_page_fk0` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`);
 
 insert into user_types(type)
-values("user");
+values(
+       "user",
+       "monderator",
+       "admin"
+);
 
-insert into user_types(type)
-values("monderator");
-
-insert into user_types(type)
-values("admin");
 
 insert into users(name, email, password, acct_created, last_login, user_type)
 -- Password is "TurtleDove"
