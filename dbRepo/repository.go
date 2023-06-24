@@ -15,4 +15,6 @@ type DatabaseRepo interface {
 	BanUser(id int, t int) error
 	CateAdd(n string) error
 	GetAllCategories() (map[int]interface{}, error)
+	GetAllSubCategories() (map[int]interface{}, error)
+	SubCateAdd(n string, id int) error
 }

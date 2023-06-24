@@ -21,6 +21,7 @@ type PageData struct {
 	SubCateDel      map[string]any
 	Form            *forms.Form
 	Data            map[int]interface{}
+	Data2           map[int]interface{}
 	Active          string
 	IsAuthenticated int
 }

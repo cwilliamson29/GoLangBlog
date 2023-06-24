@@ -101,17 +101,25 @@ func (b *BHandlers) AdminCategoryHandler(w http.ResponseWriter, r *http.Request)
 
 	// Check if user is admin
 	if uAdmin {
-		//var userList map[int]interface{}
-		//userList, err := b.DB.GetAllUsers()
-		//if err != nil {
-		//	log.Println(err)
-		//	return
-		//}
-
+		var cList map[int]interface{}
+		var scList map[int]interface{}
+		cList, err := b.DB.GetAllCategories()
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		scList, err = b.DB.GetAllSubCategories()
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		log.Println("***Data***", cList)
+		log.Println("***Data2***", scList)
 		err = b.AdminTemplates.ExecuteTemplate(w, "admin.category.page.tmpl", &models.PageData{
 			IsAuthenticated: pd.IsAuthenticated,
-			//Data:            userList,
-			Active: "categories",
+			Data:            cList,
+			Data2:           scList,
+			Active:          "categories",
 		})
 		if err != nil {
 			log.Println(err)

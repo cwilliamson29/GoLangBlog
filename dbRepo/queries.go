@@ -15,7 +15,9 @@ var queryBanUser = `UPDATE users SET banned = ? WHERE id=?`
 
 // Categories Queries
 var queryCateGetAll = `SELECT id, name FROM category ORDER BY id DESC`
+var querySubCateGetAll = `SELECT id, name, parent_category FROM sub_category ORDER BY id DESC`
 var queryCateAdd = `INSERT INTO category(name) VALUE (?)`
+var querySubCateAdd = `INSERT INTO sub_category(name, parent_category) VALUE (?, ?)`
 var queryCateDel = `DELETE FROM category WHERE id = ?`
 
 // Sub-Categories Queries

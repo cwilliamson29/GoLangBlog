@@ -24,3 +24,8 @@ type Category struct {
 	Name string
 	ID   int
 }
+type SubCategory struct {
+	Name      string
+	ID        int
+	ParentCat int
+}

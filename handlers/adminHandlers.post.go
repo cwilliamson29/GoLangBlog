@@ -174,7 +174,53 @@ func (b *BHandlers) PostCategoryAddHandler(w http.ResponseWriter, r *http.Reques
 		err2 := b.AdminTemplates.ExecuteTemplate(w, "admin.category.page.tmpl", &models.PageData{
 			IsAuthenticated: pd.IsAuthenticated,
 			Data:            cgList,
-			Active:          "users",
+			Active:          "category",
+			CateAdd:         cAdd,
+		})
+		if err2 != nil {
+			log.Println(err)
+			return
+		}
+	}
+}
+
+func (b *BHandlers) PostSubCategoryAddHandler(w http.ResponseWriter, r *http.Request) {
+	pd := b.UserExists(&models.PageData{}, r)
+
+	// Check if user logged in
+	uAdmin, err := b.IsAdmin(w, r)
+	if err != nil {
+		log.Println(err)
+	}
+	// Check if user is admin
+	if uAdmin {
+		err = r.ParseForm()
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		id, _ := strconv.Atoi(r.Form.Get("category_id"))
+		n := r.Form.Get("name")
+		cAdd := make(map[string]any)
+		// Write to the DB
+		err = b.DB.SubCateAdd(n, id)
+		if err != nil {
+			cAdd["error"] = err
+		} else {
+			cAdd["success"] = "Category Added Successfully"
+		}
+
+		var cgList map[int]interface{}
+		cgList, err = b.DB.GetAllCategories()
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		// Redirect back to users
+		err2 := b.AdminTemplates.ExecuteTemplate(w, "admin.category.page.tmpl", &models.PageData{
+			IsAuthenticated: pd.IsAuthenticated,
+			Data:            cgList,
+			Active:          "category",
 			CateAdd:         cAdd,
 		})
 		if err2 != nil {
