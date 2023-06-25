@@ -24,17 +24,27 @@ func (b *BHandlers) LoginHandler(w http.ResponseWriter, r *http.Request) {
 func (b *BHandlers) AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 	err := b.UITemplates.ExecuteTemplate(w, "authorizeLogin.page.tmpl", &models.PageData{})
 	if err != nil {
+		http.Error(w, "unable to execute the template", http.StatusInternalServerError)
 		return
 	}
 }
 
-// PostLoginHandler - for getting the individual pages
+// PostLoginHandler - Login page for user side
 func (b *BHandlers) PostLoginHandler(w http.ResponseWriter, r *http.Request) {
 	err := b.LoginHelper("ui", w, r)
 	if err != nil {
 		log.Println(err)
 	}
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+// PostAdminLoginHandler - Login page for Admin section
+func (b *BHandlers) PostAdminLoginHandler(w http.ResponseWriter, r *http.Request) {
+	err := b.LoginHelper("admin", w, r)
+	if err != nil {
+		log.Println(err)
+	}
+	http.Redirect(w, r, "/admin", http.StatusSeeOther)
 }
 
 // LoginHelper - Logic for login function
@@ -74,14 +84,6 @@ func (b *BHandlers) LoginHelper(t string, w http.ResponseWriter, r *http.Request
 	b.Session.Put(r.Context(), "flash", "Valid Login")
 
 	return nil
-}
-
-func (b *BHandlers) PostAdminLoginHandler(w http.ResponseWriter, r *http.Request) {
-	err := b.LoginHelper("admin", w, r)
-	if err != nil {
-		log.Println(err)
-	}
-	http.Redirect(w, r, "/admin", http.StatusSeeOther)
 }
 
 // LogoutHandler - Handle logout

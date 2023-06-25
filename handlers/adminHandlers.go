@@ -55,6 +55,7 @@ func (b *BHandlers) AdminUsersHandler(w http.ResponseWriter, r *http.Request) {
 			IsAuthenticated: pd.IsAuthenticated,
 			Data:            userList,
 			Active:          "users",
+			UA:              "userAdd",
 		})
 		if err != nil {
 			log.Println(err)
@@ -113,13 +114,12 @@ func (b *BHandlers) AdminCategoryHandler(w http.ResponseWriter, r *http.Request)
 			log.Println(err)
 			return
 		}
-		log.Println("***Data***", cList)
-		log.Println("***Data2***", scList)
 		err = b.AdminTemplates.ExecuteTemplate(w, "admin.category.page.tmpl", &models.PageData{
 			IsAuthenticated: pd.IsAuthenticated,
 			Data:            cList,
 			Data2:           scList,
 			Active:          "categories",
+			CA:              "addc",
 		})
 		if err != nil {
 			log.Println(err)

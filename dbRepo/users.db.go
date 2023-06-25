@@ -11,23 +11,6 @@ import (
 	"time"
 )
 
-// Functions for accessing database
-
-// InsertPost - Creating new a blog post
-func (m *MySqlDB) InsertPost(newPost models.Post) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	//query := `INSERT INTO posts(title, content, user_id) VALUES($1, $2, $3)`
-
-	_, err := m.DB.ExecContext(ctx, queryInsertPost, newPost.Title, newPost.Content, newPost.UserID)
-	if err != nil {
-		log.Println(err)
-		return err
-	}
-	return nil
-}
-
 // GetUserById - Get a user from the database
 func (m *MySqlDB) GetUserById(id int) (*models.User, error) {
 	var results *DbRow
@@ -53,7 +36,7 @@ func (m *MySqlDB) GetUserById(id int) (*models.User, error) {
 	return &u, nil
 }
 
-// AddUser - Addes a user to the database
+// AddUser - Adds a user to the database
 func (m *MySqlDB) AddUser(u models.User) error {
 	var exists *DbRow
 	var suc bool
@@ -121,51 +104,6 @@ func (m *MySqlDB) AuthenticateUser(email string, password string) (int, string, 
 	return id, hashedPW, nil
 }
 
-func (m *MySqlDB) GetBlogPost() (int, int, string, string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	var id, uID int
-	var aTitle, aContent string
-
-	query := `SELECT id, user_id, title, content FROM posts LIMIT 1`
-
-	row := m.DB.QueryRowContext(ctx, query)
-
-	err := row.Scan(&id, &uID, &aTitle, &aContent)
-
-	if err != nil {
-		return id, uID, "", "", err
-	}
-	return id, uID, aTitle, aContent, nil
-}
-
-// Get3BlogPost - Gets first 3 blog posts out of DB
-func (m *MySqlDB) Get3BlogPost() (map[int]interface{}, error) {
-	var results *DbRow
-	ct := m.Connect()
-	if ct {
-		results = m.Get(queryGet3BlogPosts, 3)
-	}
-
-	var artList models.ArticleList
-	artCollection := make(map[int]interface{})
-
-	for i := 0; i <= 8; {
-		id, _ := strconv.Atoi(results.Row[i])
-		uId, _ := strconv.Atoi(results.Row[i+1])
-
-		artList.ID = id
-		artList.UserID = uId
-		artList.Title = results.Row[i+2]
-		artList.Content = results.Row[i+3]
-		artCollection[id] = artList
-
-		i = i + 4
-	}
-
-	return artCollection, nil
-}
-
 // GetAllUsers - Gets a list of all users
 func (m *MySqlDB) GetAllUsers() (map[int]interface{}, error) {
 	var results *DbRow
@@ -225,93 +163,4 @@ func (m *MySqlDB) BanUser(id int, t int) error {
 	} else {
 		return errors.New("user not banned")
 	}
-}
-
-// CateAdd - Creates category title
-func (m *MySqlDB) CateAdd(n string) error {
-	var success bool
-	ct := m.Connect()
-	if ct {
-		success, _ = m.Insert(queryCateAdd, n)
-	}
-	// check if return true for success
-	if success {
-		return nil
-	} else {
-		return errors.New("Category not added")
-	}
-}
-
-// SubCateAdd - Creates sub category title
-func (m *MySqlDB) SubCateAdd(n string, id int) error {
-	var success bool
-	ct := m.Connect()
-	if ct {
-		success, _ = m.Insert(querySubCateAdd, n, id)
-	}
-	// check if return true for success
-	if success {
-		return nil
-	} else {
-		return errors.New("Sub category not added")
-	}
-}
-
-// GetAllCategories - Gets a list of all users
-func (m *MySqlDB) GetAllCategories() (map[int]interface{}, error) {
-	var results *DbRow
-	ct := m.Connect()
-	if ct {
-		results = m.Get(queryCateGetAll)
-	}
-
-	var cat models.Category
-	cCollection := make(map[int]interface{})
-
-	count := len(results.Row)
-	c := count - 2
-
-	for i := 0; i <= c; {
-		id, _ := strconv.Atoi(results.Row[i])
-
-		cat.ID = id
-		cat.Name = results.Row[i+1]
-		cCollection[id] = cat
-
-		i = i + 2
-	}
-	return cCollection, nil
-}
-
-// GetAllSubCategories - Gets a list of all users
-func (m *MySqlDB) GetAllSubCategories() (map[int]interface{}, error) {
-	var results *DbRow
-	ct := m.Connect()
-	if ct {
-		results = m.Get(querySubCateGetAll)
-	}
-
-	var cat models.SubCategory
-	scCollection := make(map[int]interface{})
-
-	count := len(results.Row)
-	var c int
-	if count >= 6 {
-		c = count - 3
-	} else {
-		c = count
-	}
-
-	for i := 0; i <= c; {
-		id, _ := strconv.Atoi(results.Row[i])
-		pId, _ := strconv.Atoi(results.Row[i+2])
-
-		cat.ID = id
-		cat.Name = results.Row[i+1]
-		cat.ParentCat = pId
-		scCollection[id] = cat
-
-		i = i + 3
-	}
-	return scCollection, nil
 }

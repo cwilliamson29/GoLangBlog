@@ -1,7 +1,7 @@
 package dbRepo
 
 // Post Queries
-var queryInsertPost = `INSERT INTO posts(title, content, user_id) VALUES($1, $2, $3)`
+var queryInsertPost = `INSERT INTO posts(title, content, user_id) VALUES(?,?,?)`
 var queryGet3BlogPosts = `SELECT id, user_id, title, content FROM posts ORDER BY id DESC LIMIT ?`
 
 // User Queries
@@ -15,9 +15,9 @@ var queryBanUser = `UPDATE users SET banned = ? WHERE id=?`
 
 // Categories Queries
 var queryCateGetAll = `SELECT id, name FROM category ORDER BY id DESC`
-var querySubCateGetAll = `SELECT id, name, parent_category FROM sub_category ORDER BY id DESC`
 var queryCateAdd = `INSERT INTO category(name) VALUE (?)`
-var querySubCateAdd = `INSERT INTO sub_category(name, parent_category) VALUE (?, ?)`
 var queryCateDel = `DELETE FROM category WHERE id = ?`
 
 // Sub-Categories Queries
+var querySubCateGetAll = `SELECT id, name, parent_category FROM sub_category ORDER BY id DESC`
+var querySubCateAdd = `INSERT INTO sub_category(name, parent_category) VALUE (?, ?)`

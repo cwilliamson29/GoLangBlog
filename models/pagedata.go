@@ -13,15 +13,12 @@ type PageData struct {
 	Warning         string
 	Error           error
 	Success         string
-	UserAdd         map[string]interface{}
-	UserDel         map[string]any
-	CateAdd         map[string]any
-	CateDel         map[string]any
-	SubCateAdd      map[string]any
-	SubCateDel      map[string]any
+	Status          map[string]any // For updating form submission status
 	Form            *forms.Form
 	Data            map[int]interface{}
 	Data2           map[int]interface{}
 	Active          string
+	UA              string
+	CA              string
 	IsAuthenticated int
 }

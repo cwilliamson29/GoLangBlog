@@ -10,23 +10,24 @@
         <div class="row">
             <div class="col-sm-10 col-md-10 col-lg-8 pt-2">
                 <div class="card">
-                    <div class="card-header bg-primary text-light">
+                    <div class="card-header">
                         <h1>Category Overview</h1>
                     </div>
                     <div class="card-body">
                         <div class="row">
                             {{$subcat := .Data2}}
                             {{ range $key, $cat := .Data}}
-                                <div class="col-3">
+                                <div class="col-3 py-2">
                                     <div class="bg-light rounded-3 border">
                                         <div class="bg-info p-1 rounded-top-3">
                                             <div class="fs-2 bold">{{$cat.Name}}</div>
-                                            <div class="fs-6">Category ID:{{$cat.ID}}</div>
+                                            {{/*<div class="fs-6">Category ID:{{$cat.ID}}</div>*/}}
                                         </div>
+                                        <label class="ps-1">Sub Categories</label>
                                         <ul class="pt-1 pb-2">
                                             {{range $key, $scat := $subcat}}
                                                 {{if eq $scat.ParentCat $cat.ID }}
-                                                    <li>{{$scat.Name}} - ID: {{$scat.ID}}</li>
+                                                    <li>{{$scat.Name}}</li>
                                                 {{end}}
                                             {{end}}
                                         </ul>
@@ -35,104 +36,165 @@
                                 </div>
                             {{end}}
                         </div>
+                    </div>
+                    <nav>
+                        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                            <button class="nav-link {{if eq .CA "addc"}}active{{end}}" id="nav-home-tab"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home"
+                                    aria-selected="true">Add Category
+                            </button>
+                            <button class="nav-link {{if eq .CA "addsc"}}active{{end}}" id="nav-add-sub-tab"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#nav-add-sub"
+                                    type="button" role="tab" aria-controls="nav-add-sub" aria-selected="false">Add
+                                Sub-Category
+                            </button>
+                            <button class="nav-link {{if eq .CA "rmc"}}active{{end}}" id="nav-rem-cat-tab"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#nav-rem-cat"
+                                    type="button" role="tab" aria-controls="nav-rem-cat" aria-selected="false">Remove
+                                Category
+                            </button>
+                            <button class="nav-link {{if eq .CA "rmsc"}}active{{end}}" id="nav-rem-sub-tab"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#nav-rem-sub"
+                                    type="button" role="tab" aria-controls="nav-rem-sub" aria-selected="false">Remove
+                                Sub-category
+                            </button>
+                        </div>
+                    </nav>
+                    <div class="tab-content py-4" id="nav-tabContent">
+                        <div class="tab-pane fade {{if eq .CA "addc"}}show active{{end}}" id="nav-home" role="tabpanel"
+                             aria-labelledby="nav-home-tab">
+                            <form method="post" action="/admin/category/add">
+                                <div class="row">
+                                    <div class="col-3 text-end">
+                                        <label for="name">Category Name:</label>
+                                    </div>
+                                    <div class="col-8">
+                                        <input type="text" class="form-control" id="name" name="name"
+                                               placeholder="Italian Food">
+                                    </div>
+                                </div>
 
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-10 col-md-10 col-lg-8 pt-3">
-                <div class="card">
-                    <div class="card-header bg-primary text-light">
-                        <h3>Add A Category</h3>
-                    </div>
-                    <div class="card-body">
-                        <form method="post" action="/admin/category/add">
-                            <div class="row">
-                                <div class="col-3 text-end">
-                                    <label for="name">Category Name:</label>
-                                </div>
-                                <div class="col-9">
-                                    <input type="text" class="form-control" id="name" name="name"
-                                           placeholder="Italian Food">
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-12 mt-3 text-center">
-                                    {{with .CateAdd.error}}
-                                        <label class="text-danger">{{.}}</label>
-                                    {{end}}
-                                </div>
-                                <div class="col-12 mt-3 text-center">
-                                    {{with .CateAdd.success}}
-                                        <label class="text-success">{{.}}</label>
-                                    {{end}}
-                                </div>
-                                <div class="col-12 mt-3 text-center">
-                                    <button class="w-50 btn btn-lg btn-primary" type="submit">
-                                        Create Category
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-10 col-md-10 col-lg-8 pt-3">
-                <div class="card">
-                    <div class="card-header bg-primary text-light">
-                        <h3>Add A Sub Category</h3>
-                    </div>
-                    <div class="card-body">
-                        <form method="post" action="/admin/category/subadd">
-                            <div class="row">
-                                <div class="col-3 text-end">
-                                    <label for="name">Sub Category Name:</label>
-                                </div>
-                                <div class="col-9">
-                                    <input type="text" class="form-control" id="name" name="name"
-                                           placeholder="Italian Food">
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-3 text-end">
-                                    <label for="category_id">Select Category:</label>
-                                </div>
-                                <div class="col-9">
-                                    <select name="category_id" id="category_id">
-                                        {{ range $key, $cat := .Data}}
-                                            <option value="{{$cat.ID}}">{{$cat.ID}} - {{$cat.Name}}</option>
+                                <div class="row">
+                                    <div class="col-12 mt-3 text-center">
+                                        {{with .Status.catAdderror}}
+                                            <label class="text-danger">{{.}}</label>
                                         {{end}}
-                                    </select>
+                                    </div>
+                                    <div class="col-12 mt-3 text-center">
+                                        {{with .Status.catAddSuccess}}
+                                            <label class="text-success">{{.}}</label>
+                                        {{end}}
+                                    </div>
+                                    <div class="col-12 mt-3 text-center">
+                                        <button class="w-50 btn btn-lg btn-primary" type="submit">
+                                            Create Category
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
+                            </form>
+                        </div>
+                        <div class="tab-pane fade {{if eq .CA "addsc"}}show active{{end}}" id="nav-add-sub"
+                             role="tabpanel" aria-labelledby="nav-add-sub-tab">
+                            <form method="post" action="/admin/category/subadd">
+                                <div class="row py-1">
+                                    <div class="col-3 text-end">
+                                        <label for="name">Sub Category Name:</label>
+                                    </div>
+                                    <div class="col-8">
+                                        <input type="text" class="form-control" id="name" name="name"
+                                               placeholder="Italian Food">
+                                    </div>
+                                </div>
+                                <div class="row py-1">
+                                    <div class="col-3 text-end">
+                                        <label for="category_id">Select Category:</label>
+                                    </div>
+                                    <div class="col-9">
+                                        <select name="category_id" id="category_id">
+                                            {{ range $key, $cat := .Data}}
+                                                <option value="{{$cat.ID}}">{{$cat.ID}} - {{$cat.Name}}</option>
+                                            {{end}}
+                                        </select>
+                                    </div>
+                                </div>
 
-                            <div class="row">
-                                <div class="col-12 mt-3 text-center">
-                                    {{with .CateAdd.error}}
-                                        <label class="text-danger">{{.}}</label>
-                                    {{end}}
+                                <div class="row">
+                                    <div class="col-12 mt-3 text-center">
+                                        {{with .Status.scatAdderror}}
+                                            <label class="text-danger">{{.}}</label>
+                                        {{end}}
+                                    </div>
+                                    <div class="col-12 mt-3 text-center">
+                                        {{with .Status.scatAddSuccess}}
+                                            <label class="text-success">{{.}}</label>
+                                        {{end}}
+                                    </div>
+                                    <div class="col-12 mt-3 text-center">
+                                        <button class="w-50 btn btn-lg btn-primary" type="submit">
+                                            Create Sub Category
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="col-12 mt-3 text-center">
-                                    {{with .CateAdd.success}}
-                                        <label class="text-success">{{.}}</label>
-                                    {{end}}
+                            </form>
+                        </div>
+                        <div class="tab-pane fade {{if eq .CA "rmc"}}show active{{end}}" id="nav-rem-cat"
+                             role="tabpanel" aria-labelledby="nav-rem-cat-tab">
+                            <form method="post" action="/admin/category/catdel">
+                                <div class="row py-1">
+                                    <div class="col-3 text-end">
+                                        <label for="category_id">Select Category:</label>
+                                    </div>
+                                    <div class="col-9">
+                                        <select name="category_id" id="category_id">
+                                            {{ range $key, $cat := .Data}}
+                                                <option value="{{$cat.ID}}">{{$cat.ID}} - {{$cat.Name}}</option>
+                                            {{end}}
+                                        </select>
+                                    </div>
                                 </div>
-                                <div class="col-12 mt-3 text-center">
-                                    <button class="w-50 btn btn-lg btn-primary" type="submit">
-                                        Create Sub Category
-                                    </button>
+
+                                <div class="row py-1">
+                                    <div class="col-3 text-end">
+                                        <label>Remove Sub Categories:</label>
+                                    </div>
+                                    <div class="col-9">
+                                        <input type="checkbox" id="subRemove" name="subRemove" value="true">
+                                        <label for="subRemove">Yes</label>
+                                    </div>
                                 </div>
-                            </div>
-                        </form>
+
+                                <div class="row">
+                                    <div class="col-12 mt-3 text-center">
+                                        {{with .Status.catRemError}}
+                                            <label class="text-danger">{{.}}</label>
+                                        {{end}}
+                                    </div>
+                                    <div class="col-12 mt-3 text-center">
+                                        {{with .Status.catRemSuccess}}
+                                            <label class="text-success">{{.}}</label>
+                                        {{end}}
+                                    </div>
+                                    <div class="col-12 mt-3 text-center">
+                                        <button class="w-50 btn btn-lg btn-primary" type="submit">
+                                            Delete Category
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="tab-pane fade {{if eq .CA "rmsc"}}show active{{end}}" id="nav-rem-sub"
+                             role="tabpanel" aria-labelledby="nav-rem-sub-tab">
+                            <label>Hello from the other side.</label>
+                        </div>
                     </div>
-
                 </div>
             </div>
         </div>
+
         <!----------------------->
     </div>
 </main>
