@@ -36,15 +36,15 @@ func (b *BHandlers) PostUserCreateHandler(w http.ResponseWriter, r *http.Request
 		form.HasRequired("name", "email", "password")
 		form.MinLength("name", 5, r)
 		form.MinLength("password", 5, r)
-		form.IsEmail("password")
+		form.IsEmail("email")
 		uStat := make(map[string]interface{})
 
 		// Write to the DB
 		err = b.DB.AddUser(createUser)
 		if err != nil {
-			uStat["error"] = err
+			uStat["addError"] = err
 		} else {
-			uStat["success"] = "User Added Successfully"
+			uStat["addSuccess"] = "User Added Successfully"
 		}
 		b.UserTempExecute(w, uStat, "userAdd")
 	}
@@ -97,6 +97,49 @@ func (b *BHandlers) PostUserDeleteHandler(w http.ResponseWriter, r *http.Request
 			uStat["userDelError"] = "Primary user account CANNOT be deleted or banned"
 		}
 		b.UserTempExecute(w, uStat, "userDel")
+	}
+}
+
+// PostUserUpdateHandler - Deletes user from database
+func (b *BHandlers) PostUserUpdateHandler(w http.ResponseWriter, r *http.Request) {
+	//pd := b.UserExists(&models.PageData{}, r)
+
+	// Check if user logged in
+	uAdmin, err := b.IsAdmin(w, r)
+	if err != nil {
+		log.Println(err)
+	}
+	// Check if user is admin
+	if uAdmin {
+		err = r.ParseForm()
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		uId, _ := strconv.Atoi(r.Form.Get("user_id"))
+		ut, _ := strconv.Atoi(r.Form.Get("user_type"))
+		updateUser := models.User{
+			Name:     r.Form.Get("name"),
+			Password: r.Form.Get("password"),
+			UserType: ut,
+			ID:       uId,
+		}
+
+		form := forms.New(r.PostForm)
+		form.HasRequired("name", "password")
+		form.MinLength("name", 5, r)
+		form.MinLength("password", 5, r)
+
+		uStat := make(map[string]interface{})
+
+		// Write to the DB
+		suc := b.DB.UpdateUser(updateUser)
+		if !suc {
+			uStat["updateError"] = err
+		} else {
+			uStat["updateSuccess"] = "User Updated Successfully"
+		}
+		b.UserTempExecute(w, uStat, "userMod")
 	}
 }
 

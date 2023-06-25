@@ -1,7 +1,6 @@
 package dbRepo
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"github.com/cwilliamson29/GoLangBlog/models"
@@ -65,22 +64,17 @@ func (m *MySqlDB) AddUser(u models.User) error {
 }
 
 // UpdateUser - Updates a user in the database
-func (m *MySqlDB) UpdateUser(u models.User) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	query := `UPDATE users SET name=$1, email=$2, last_login=#3, user_type=$4`
-
-	_, err := m.DB.ExecContext(ctx, query,
-		u.Name,
-		u.Email,
-		time.Now(),
-		u.UserType)
-
+func (m *MySqlDB) UpdateUser(u models.User) bool {
+	var suc bool
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return err
+		log.Println(err)
 	}
-	return nil
+	ct := m.Connect()
+	if ct {
+		suc = m.Update(queryUpdateUser, u.Name, hashedPassword, u.UserType, u.ID)
+	}
+	return suc
 }
 
 // AuthenticateUser - Checks database for user and logs in

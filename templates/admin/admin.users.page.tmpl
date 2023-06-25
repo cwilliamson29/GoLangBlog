@@ -16,26 +16,26 @@
                     <div class="card-body">
                         <nav>
                             <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                                <button class="nav-link {{if eq .UA "userAdd"}}active{{end}}" id="nav-home-tab"
+                                <button class="nav-link {{if eq .UA "userAdd"}}active{{end}}" id="nav-add-tab"
                                         data-bs-toggle="tab"
-                                        data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home"
+                                        data-bs-target="#nav-add" type="button" role="tab" aria-controls="nav-add"
                                         aria-selected="true">Add User
                                 </button>
-                                <button class="nav-link {{if eq .UA "userDel"}}active{{end}}" id="nav-profile-tab"
+                                <button class="nav-link {{if eq .UA "userDel"}}active{{end}}" id="nav-del-tab"
                                         data-bs-toggle="tab"
-                                        data-bs-target="#nav-profile" type="button" role="tab"
-                                        aria-controls="nav-profile" aria-selected="false">Delete/Ban User
+                                        data-bs-target="#nav-del" type="button" role="tab"
+                                        aria-controls="nav-del" aria-selected="false">Delete/Ban User
                                 </button>
-                                <button class="nav-link {{if eq .UA "userMod"}}active{{end}}" id="nav-contact-tab"
+                                <button class="nav-link {{if eq .UA "userMod"}}active{{end}}" id="nav-update-tab"
                                         data-bs-toggle="tab"
-                                        data-bs-target="#nav-contact" type="button" role="tab"
-                                        aria-controls="nav-contact" aria-selected="false">Update User
+                                        data-bs-target="#nav-update" type="button" role="tab"
+                                        aria-controls="nav-update" aria-selected="false">Update User
                                 </button>
                             </div>
                         </nav>
                         <div class="tab-content py-4" id="nav-tabContent">
-                            <div class="tab-pane fade {{if eq .UA "userAdd"}}show active{{end}}" id="nav-home"
-                                 role="tabpanel" aria-labelledby="nav-home-tab">
+                            <div class="tab-pane fade {{if eq .UA "userAdd"}}show active{{end}}" id="nav-add"
+                                 role="tabpanel" aria-labelledby="nav-add-tab">
                                 <form method="post" action="/admin/user/create">
                                     <div class="row py-1">
                                         <div class="col-3 text-end">
@@ -77,12 +77,12 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-12 mt-3 text-center">
-                                            {{with .Status.error}}
+                                            {{with .Status.addError}}
                                                 <label class="text-danger">{{.}}</label>
                                             {{end}}
                                         </div>
                                         <div class="col-12 mt-3 text-center">
-                                            {{with .Status.success}}
+                                            {{with .Status.addSuccess}}
                                                 <label class="text-success">{{.}}</label>
                                             {{end}}
                                         </div>
@@ -93,8 +93,8 @@
                                     </div>
                                 </form>
                             </div>
-                            <div class="tab-pane fade {{if eq .UA "userDel"}}show active{{end}}" id="nav-profile"
-                                 role="tabpanel" aria-labelledby="nav-profile-tab">
+                            <div class="tab-pane fade {{if eq .UA "userDel"}}show active{{end}}" id="nav-del"
+                                 role="tabpanel" aria-labelledby="nav-del-tab">
                                 <form method="post" action="/admin/user/delete">
                                     <div class="row py-1">
                                         <div class="col-3 text-end">
@@ -139,9 +139,68 @@
                                     </div>
                                 </form>
                             </div>
-                            <div class="tab-pane fade {{if eq .UA "userMod"}}show active{{end}}" id="nav-contact"
-                                 role="tabpanel" aria-labelledby="nav-contact-tab">
-                                ...
+                            <div class="tab-pane fade {{if eq .UA "userMod"}}show active{{end}}" id="nav-update"
+                                 role="tabpanel" aria-labelledby="nav-update-tab">
+                                <form method="post" action="/admin/user/update">
+                                    <div class="row py-1">
+                                        <div class="col-3 text-end">
+                                            <label for="user_id">Select User</label>
+                                        </div>
+                                        <div class="col-9">
+                                            <select name="user_id" id="user_id">
+                                                {{ range $key, $value := .Data}}
+                                                    <option value="{{$value.ID}}">{{$value.ID}} - {{$value.Name}}
+                                                        - {{$value.Email}} {{if eq $value.Banned 1 }}- [ BANNED ]{{end}}</option>
+                                                {{end}}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row py-1">
+                                        <div class="col-3 text-end">
+                                            <label for="name">Name:</label>
+                                        </div>
+                                        <div class="col-9">
+                                            <input type="text" class="form-control" id="name" name="name"
+                                                   placeholder="John doe">
+                                        </div>
+                                    </div>
+                                    <div class="row py-1">
+                                        <div class="col-3 text-end">
+                                            <label for="password">Password:</label>
+                                        </div>
+                                        <div class="col-9">
+                                            <input type="password" class="form-control" id="password" name="password">
+                                        </div>
+                                    </div>
+                                    <div class="row py-1">
+                                        <div class="col-3 text-end">
+                                            <label for="user_type">User Type:</label>
+                                        </div>
+                                        <div class="col-9">
+                                            <select name="user_type" id="user_type">
+                                                <option value="1">1 - User</option>
+                                                <option value="2">2 - Moderator</option>
+                                                <option value="3">3 - Admin</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12 mt-3 text-center">
+                                            {{with .Status.updateError}}
+                                                <label class="text-danger">{{.}}</label>
+                                            {{end}}
+                                        </div>
+                                        <div class="col-12 mt-3 text-center">
+                                            {{with .Status.updateSuccess}}
+                                                <label class="text-success">{{.}}</label>
+                                            {{end}}
+                                        </div>
+                                        <div class="col-12 mt-3 text-center">
+                                            <button class="w-50 btn btn-lg btn-primary" type="submit">Update User
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>

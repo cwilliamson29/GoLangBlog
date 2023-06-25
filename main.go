@@ -73,6 +73,7 @@ func main() {
 	router.Post("/admin/login", handlers.Repo.PostAdminLoginHandler)
 	router.Post("/admin/user/create", handlers.Repo.PostUserCreateHandler)
 	router.Post("/admin/user/delete", handlers.Repo.PostUserDeleteHandler)
+	router.Post("/admin/user/update", handlers.Repo.PostUserUpdateHandler)
 	router.Post("/admin/category/add", handlers.Repo.PostCategoryAddHandler)
 	router.Post("/admin/category/subadd", handlers.Repo.PostSubCategoryAddHandler)
 	router.Post("/admin/category/catdel", handlers.Repo.PostCategoryDeleteHandler)

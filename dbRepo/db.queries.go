@@ -8,6 +8,7 @@ var queryGet3BlogPosts = `SELECT id, user_id, title, content FROM posts ORDER BY
 var queryLoginUser = `SELECT id, password FROM users WHERE email=?`
 var queryGetAllUsers = `SELECT id, name, email, user_type, banned FROM users ORDER BY id DESC`
 var queryGetUserById = `SELECT name, email, password, acct_created, last_login, user_type, id FROM users WHERE id = ?`
+var queryUpdateUser = `UPDATE users SET name=?, password=?, user_type=? WHERE id=?`
 var queryFindByEmail = `SELECT email FROM users WHERE email = ?`
 var queryAddUser = `INSERT INTO users(name, email, password, user_type, acct_created, last_login) VALUES(?, ?, ?, ?, ?, ?)`
 var queryDeleteUser = `DELETE FROM users WHERE id = ?`
