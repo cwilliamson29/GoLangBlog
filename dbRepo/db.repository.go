@@ -17,4 +17,8 @@ type DatabaseRepo interface {
 	GetAllCategories() (map[int]interface{}, error)
 	GetAllSubCategories() (map[int]interface{}, error)
 	SubCateAdd(n string, id int) error
+	CountSubCategoriesById(id int) (int, error)
+	DeleteCategoryById(id int) error
+	DeleteSubCategoryById(id int) error
+	DeleteSubByParent(id int) error
 }

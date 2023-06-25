@@ -47,25 +47,6 @@ func (b *BHandlers) PostUserCreateHandler(w http.ResponseWriter, r *http.Request
 			uStat["success"] = "User Added Successfully"
 		}
 		b.UserTempExecute(w, uStat, "userAdd")
-
-		//var userList map[int]interface{}
-		//userList, err := b.DB.GetAllUsers()
-		//if err != nil {
-		//	log.Println(err)
-		//	return
-		//}
-		//
-		//// Redirect back to users
-		//err2 := b.AdminTemplates.ExecuteTemplate(w, "admin.users.page.tmpl", &models.PageData{
-		//	IsAuthenticated: pd.IsAuthenticated,
-		//	Data:            userList,
-		//	Active:          "users",
-		//	UserAdd:         userAdd,
-		//})
-		//if err2 != nil {
-		//	log.Println(err)
-		//	return
-		//}
 	}
 }
 
@@ -115,26 +96,7 @@ func (b *BHandlers) PostUserDeleteHandler(w http.ResponseWriter, r *http.Request
 		} else {
 			uStat["userDelError"] = "Primary user account CANNOT be deleted or banned"
 		}
-
 		b.UserTempExecute(w, uStat, "userDel")
-
-		//var userList map[int]interface{}
-		//userList, err = b.DB.GetAllUsers()
-		//if err != nil {
-		//	log.Println(err)
-		//	return
-		//}
-		//// Redirect back to users
-		//err2 := b.AdminTemplates.ExecuteTemplate(w, "admin.users.page.tmpl", &models.PageData{
-		//	IsAuthenticated: pd.IsAuthenticated,
-		//	Data:            userList,
-		//	Active:          "users",
-		//	UserDel:         uDel,
-		//})
-		//if err2 != nil {
-		//	log.Println(err)
-		//	return
-		//}
 	}
 }
 

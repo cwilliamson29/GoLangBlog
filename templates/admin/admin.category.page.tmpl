@@ -169,12 +169,12 @@
 
                                 <div class="row">
                                     <div class="col-12 mt-3 text-center">
-                                        {{with .Status.catRemError}}
+                                        {{with .Status.catDelError}}
                                             <label class="text-danger">{{.}}</label>
                                         {{end}}
                                     </div>
                                     <div class="col-12 mt-3 text-center">
-                                        {{with .Status.catRemSuccess}}
+                                        {{with .Status.catDelSuccess}}
                                             <label class="text-success">{{.}}</label>
                                         {{end}}
                                     </div>
@@ -188,7 +188,45 @@
                         </div>
                         <div class="tab-pane fade {{if eq .CA "rmsc"}}show active{{end}}" id="nav-rem-sub"
                              role="tabpanel" aria-labelledby="nav-rem-sub-tab">
-                            <label>Hello from the other side.</label>
+                            <form method="post" action="/admin/category/subcatdel">
+                                <div class="row py-1">
+                                    <div class="col-3 text-end">
+                                        <label for="sub_category_id">Select Sub-Category:</label>
+                                    </div>
+                                    <div class="col-9">
+                                        <select name="sub_category_id" id="sub_category_id">
+                                            {{$subcat := .Data2}}
+                                            {{ range $key, $cat := .Data}}
+                                                {{range $key, $scat := $subcat}}
+                                                    {{if eq $scat.ParentCat $cat.ID}}
+                                                        <option value="{{$scat.ID}}">
+                                                            {{$cat.Name}} - {{$scat.Name}}
+                                                        </option>
+                                                    {{end}}
+                                                {{end}}
+                                            {{end}}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-12 mt-3 text-center">
+                                        {{with .Status.catDelError}}
+                                            <label class="text-danger">{{.}}</label>
+                                        {{end}}
+                                    </div>
+                                    <div class="col-12 mt-3 text-center">
+                                        {{with .Status.catDelSuccess}}
+                                            <label class="text-success">{{.}}</label>
+                                        {{end}}
+                                    </div>
+                                    <div class="col-12 mt-3 text-center">
+                                        <button class="w-50 btn btn-lg btn-primary" type="submit">
+                                            Delete Sub-Category
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/cwilliamson29/GoLangBlog/models"
 	"log"
 	"net/http"
@@ -85,19 +86,67 @@ func (b *BHandlers) PostCategoryDeleteHandler(w http.ResponseWriter, r *http.Req
 		stat := make(map[string]any)
 		// Write to the DB
 		if sr == "true" {
-			err = b.DB.SubCateAdd(n, id)
-			if err != nil {
+			err = b.DB.DeleteSubByParent(id)
+			err1 := b.DB.DeleteCategoryById(id)
+			if err != nil && err1 != nil {
 				stat["catDelError"] = err
 			} else {
 				stat["catDelSuccess"] = "Category Removed Successfully"
 			}
 		} else {
-			stat["catDelError"] = ""
+			c, err2 := b.DB.CountSubCategoriesById(id)
+			if err2 != nil {
+				stat["catDelError"] = err2
+			}
+			if c > 0 {
+				d := c / 3
+				stat["catDelError"] = fmt.Sprintf("%d sub categories, cannot delete.", d)
+			} else {
+				err = b.DB.DeleteCategoryById(id)
+				if err != nil {
+					stat["catDelError"] = err
+				} else {
+					stat["catDelSuccess"] = "Category Removed Successfully"
+				}
+			}
+
 		}
 
-		b.CategoryTempExecute(w, stat, "addsc")
+		b.CategoryTempExecute(w, stat, "rmc")
 	}
 }
+
+// PostSubCategoryDeleteHandler - Delete category from database
+func (b *BHandlers) PostSubCategoryDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	//pd := b.UserExists(&models.PageData{}, r)
+
+	// Check if user logged in
+	uAdmin, err := b.IsAdmin(w, r)
+	if err != nil {
+		log.Println(err)
+	}
+	// Check if user is admin
+	if uAdmin {
+		err = r.ParseForm()
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		id, _ := strconv.Atoi(r.Form.Get("sub_category_id"))
+		stat := make(map[string]any)
+
+		// Write to the DB
+		err = b.DB.DeleteSubCategoryById(id)
+		if err != nil {
+			stat["catDelError"] = err
+		} else {
+			stat["catDelSuccess"] = "Sub-Category Removed Successfully"
+		}
+		b.CategoryTempExecute(w, stat, "rmsc")
+	}
+}
+
+// CategoryTempExecute - executes the template for each POST
 func (b *BHandlers) CategoryTempExecute(w http.ResponseWriter, cAdd map[string]any, ca string) {
 	var cList map[int]interface{}
 	var scList map[int]interface{}

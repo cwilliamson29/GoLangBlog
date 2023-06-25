@@ -76,6 +76,7 @@ func main() {
 	router.Post("/admin/category/add", handlers.Repo.PostCategoryAddHandler)
 	router.Post("/admin/category/subadd", handlers.Repo.PostSubCategoryAddHandler)
 	router.Post("/admin/category/catdel", handlers.Repo.PostCategoryDeleteHandler)
+	router.Post("/admin/category/subcatdel", handlers.Repo.PostSubCategoryDeleteHandler)
 
 	fileServer := http.FileServer(http.Dir("./templates/"))
 	router.Handle("/static/*", http.StripPrefix("/static", fileServer))

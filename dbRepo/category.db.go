@@ -94,3 +94,61 @@ func (m *MySqlDB) GetAllSubCategories() (map[int]interface{}, error) {
 	}
 	return scCollection, nil
 }
+
+// CountSubCategoriesById - Gets a list of all users
+func (m *MySqlDB) CountSubCategoriesById(id int) (int, error) {
+	var results *DbRow
+	ct := m.Connect()
+	if ct {
+		results = m.Get(queryGetSubCateById, id)
+	}
+	c := len(results.Row)
+	count := c
+
+	return count, nil
+}
+
+// DeleteCategoryById
+func (m *MySqlDB) DeleteCategoryById(id int) error {
+	var success bool
+	ct := m.Connect()
+	if ct {
+		success = m.Delete(queryCategoryDelete, id)
+	}
+	// check if return true for success
+	if success {
+		return nil
+	} else {
+		return errors.New("Category has references to sub-category")
+	}
+}
+
+// DeleteSubCategoryById
+func (m *MySqlDB) DeleteSubCategoryById(id int) error {
+	var success bool
+	ct := m.Connect()
+	if ct {
+		success = m.Delete(queryDeleteSubCategory, id)
+	}
+	// check if return true for success
+	if success {
+		return nil
+	} else {
+		return errors.New("Sub category has references to blog posts")
+	}
+}
+
+// DeleteSubByParent
+func (m *MySqlDB) DeleteSubByParent(id int) error {
+	var success bool
+	ct := m.Connect()
+	if ct {
+		success = m.Delete(queryDeleteSubByParent, id)
+	}
+	// check if return true for success
+	if success {
+		return nil
+	} else {
+		return errors.New("Sub category has references to blog posts")
+	}
+}
