@@ -86,26 +86,76 @@
                                         </form>
                                     </div>
                                 </div>
+                                <div class="card my-4">
+                                    <div class="card-header">
+                                        <h5>Change Main Navbar</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <form method="post" action="/admin/menu/editisnav">
+                                            <div class="row py-1">
+                                                <div class="col-3 text-end">
+                                                    <label for="menu_id">Select Menu:</label>
+                                                </div>
+                                                <div class="col-9">
+                                                    <select name="menu_id" id="menu_id">
+                                                        {{ range $key, $menu := .Data}}
+                                                            <option value="{{$menu.ID}}">{{$menu.ID}}
+                                                                - {{$menu.Name}} {{if eq $menu.IsNavbar 1}} [CURRENT NAVBAR] {{end}}</option>
+                                                        {{end}}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="row py-1">
+                                                <div class="col-3 text-end">
+                                                    <label>Is Main Navbar:</label>
+                                                </div>
+                                                <div class="col-9">
+                                                    <input type="radio" id="yes" name="is_navbar" value="1">
+                                                    <label for="yes">Yes</label>
+                                                    <input type="radio" id="no" name="is_navbar" value="0">
+                                                    <label for="no">No</label>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-12 mt-3 text-center">
+                                                    {{with .Status.isNavError}}
+                                                        <label class="text-danger">{{.}}</label>
+                                                    {{end}}
+                                                </div>
+                                                <div class="col-12 mt-3 text-center">
+                                                    {{with .Status.isNavSuccess}}
+                                                        <label class="text-success">{{.}}</label>
+                                                    {{end}}
+                                                </div>
+                                                <div class="col-12 mt-3 text-center">
+                                                    <button class="w-50 btn btn-lg btn-primary" type="submit">Change
+                                                        Main Navbar
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
                             <div class="tab-pane fade {{if eq .MA "menuAddPage"}}show active{{end}}" id="nav-add-page"
                                  role="tabpanel"
                                  aria-labelledby="nav-add-page-tab">
-                                <form method="post" action="/admin/menu/create">
+                                <form method="post" action="/admin/menu/ediit">
                                     <div class="row py-1">
                                         <div class="col-3 text-end">
                                             <label for="category_id">Select Category:</label>
                                         </div>
                                         <div class="col-9">
                                             <select name="category_id" id="category_id">
-                                                {{ range $key, $cat := .Data}}
-                                                    <option value="{{$cat.ID}}">{{$cat.ID}} - {{$cat.Name}}</option>
+                                                {{ range $key, $menu := .Data}}
+                                                    <option value="{{$menu.ID}}">{{$menu.ID}} - {{$menu.Name}}</option>
                                                 {{end}}
                                             </select>
                                         </div>
                                     </div>
                                     <div class="row py-1">
                                         <div class="col-3 text-end">
-                                            <label>Include Sub Categories:</label>
+                                            <label>Is Main Navbar:</label>
                                         </div>
                                         <div class="col-9">
                                             <input type="checkbox" id="subRemove" name="subRemove" value="true">

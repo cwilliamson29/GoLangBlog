@@ -19,16 +19,18 @@ func (m *MySqlDB) GetAllMenus() (map[int]interface{}, error) {
 	Collection := make(map[int]interface{})
 
 	count := len(results.Row)
-	c := count - 2
+	c := count - 3
 
 	for i := 0; i <= c; {
 		id, _ := strconv.Atoi(results.Row[i])
+		isn, _ := strconv.Atoi(results.Row[i+2])
 
 		menu.ID = id
 		menu.Name = results.Row[i+1]
+		menu.IsNavbar = isn
 		Collection[id] = menu
 
-		i = i + 2
+		i = i + 3
 	}
 	return Collection, nil
 }
@@ -67,4 +69,14 @@ func (m *MySqlDB) IsNavFind() ([]string, error) {
 	rtn := results.Row
 	// check if return true for success
 	return rtn, nil
+}
+
+// UpdateUser - Updates a user in the database
+func (m *MySqlDB) UpdateIsNav(n int, id int) bool {
+	var suc bool
+	ct := m.Connect()
+	if ct {
+		suc = m.Update(queryEditIsNav, n, id)
+	}
+	return suc
 }

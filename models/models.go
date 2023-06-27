@@ -31,6 +31,7 @@ type SubCategory struct {
 }
 
 type MainMenu struct {
-	ID   int
-	Name string
+	ID       int
+	Name     string
+	IsNavbar int
 }

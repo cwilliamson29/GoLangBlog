@@ -27,4 +27,5 @@ type DatabaseRepo interface {
 	// Menu functions
 	GetAllMenus() (map[int]interface{}, error)
 	MenuCreate(n string, nav int) error
+	UpdateIsNav(n int, id int) bool
 }

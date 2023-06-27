@@ -27,6 +27,7 @@ var queryDeleteSubCategory = `DELETE FROM sub_category WHERE id = ?`
 var queryDeleteSubByParent = `DELETE FROM sub_category WHERE parent_category = ?`
 
 // Menu Queries
-var queryGetAllMenus = `SELECT id, name FROM menu ORDER BY id`
+var queryGetAllMenus = `SELECT id, name, is_navbar FROM menu ORDER BY id`
 var queryCreateMenu = `INSERT INTO menu(name, is_navbar) VALUE (?,?)`
+var queryEditIsNav = `UPDATE menu SET is_navbar=? WHERE id=?`
 var queryFindIsNav = `SELECT id, name FROM menu where is_navbar = 1`
