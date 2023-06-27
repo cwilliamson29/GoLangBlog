@@ -20,5 +20,6 @@ type PageData struct {
 	Active          string
 	UA              string
 	CA              string
+	MA              string
 	IsAuthenticated int
 }

@@ -74,16 +74,11 @@ func (b *BHandlers) AdminMenuHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Check if user is admin
 	if uAdmin {
-		//var userList map[int]interface{}
-		//userList, err := b.DB.GetAllUsers()
-		//if err != nil {
-		//	log.Println(err)
-		//	return
-		//}
 
 		err = b.AdminTemplates.ExecuteTemplate(w, "admin.menu.page.tmpl", &models.PageData{
 			IsAuthenticated: pd.IsAuthenticated,
 			Active:          "menu",
+			MA:              "menuCreate",
 		})
 		if err != nil {
 			log.Println(err)

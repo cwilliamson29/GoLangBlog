@@ -1,21 +1,21 @@
 USE blog;
 
 CREATE TABLE `users` (
-                         `id` INT NOT NULL AUTO_INCREMENT,
-                         `name` varchar(45) NOT NULL,
-                         `email` varchar(125) NOT NULL,
-                         `password` varchar(256) NOT NULL,
-                         `user_type` int NOT NULL,
-                         `banned` BOOL DEFAULT 0 NOT NULL;
-                         `acct_created` TIMESTAMP NOT NULL,
-                         `last_login` TIMESTAMP NOT NULL,
-                         PRIMARY KEY (`id`)
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `name` varchar(45) NOT NULL,
+    `email` varchar(125) NOT NULL,
+    `password` varchar(256) NOT NULL,
+    `user_type` int NOT NULL,
+    `banned` BOOL DEFAULT 0 NOT NULL;
+    `acct_created` TIMESTAMP NOT NULL,
+    `last_login` TIMESTAMP NOT NULL,
+    PRIMARY KEY (`id`)
 );
 
 CREATE TABLE `user_types` (
-                              `id` int NOT NULL AUTO_INCREMENT,
-                              `type` varchar(45) NOT NULL,
-                              PRIMARY KEY (`id`)
+    `id` int NOT NULL AUTO_INCREMENT,
+    `type` varchar(45) NOT NULL,
+    PRIMARY KEY (`id`)
 );
 
 CREATE TABLE `posts` (
@@ -50,29 +50,7 @@ CREATE TABLE `sub_category` (
     PRIMARY KEY (`id`)
 );
 
-CREATE TABLE `navbar`(
-    `id` INT NOT NULL AUTO_INCREMENT,
-    `name` varchar(45) NOT NULL,
-    `position` INT NOT NULL,
-    `menu_id` int,
-    `single_page_id` int,
-    PRIMARY KEY (`id`)
-);
 
-CREATE TABLE `menu` (
-    `id` INT NOT NULL AUTO_INCREMENT,
-    `name` varchar(45) NOT NULL,
-    `target` varchar(256) NOT NULL,
-    PRIMARY KEY (`id`)
-);
-
-CREATE TABLE `menu_item`(
-    `id` INT NOT NULL AUTO_INCREMENT,
-    `name` varchar(45) NOT NULL,
-    `target` varchar(256) NOT NULL,
-    `menu_parent_id` INT NOT NULL,
-    PRIMARY KEY (`id`)
-);
 
 CREATE TABLE `site_settings` (
     `id` INT NOT NULL AUTO_INCREMENT,
@@ -93,11 +71,7 @@ CREATE TABLE `single_page` (
 
 ALTER TABLE `users` ADD CONSTRAINT `users_fk0` FOREIGN KEY (`user_type`) REFERENCES `user_types`(`id`);
 
-ALTER TABLE `navbar` ADD CONSTRAINT `navbar_fk0` FOREIGN KEY (`menu_id`) REFERENCES `menu`(`id`);
 
-ALTER TABLE `navbar` ADD CONSTRAINT `navbar_fk1` FOREIGN KEY (`single_page_id`) REFERENCES `single_page`(`id`);
-
-ALTER TABLE `menu_item` ADD CONSTRAINT `menu_item_fk0` FOREIGN KEY (`menu_parent_id`) REFERENCES `menu`(`id`);
 
 ALTER TABLE `posts` ADD CONSTRAINT `posts_fk0` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`);
 

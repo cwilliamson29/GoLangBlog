@@ -29,3 +29,8 @@ type SubCategory struct {
 	ID        int
 	ParentCat int
 }
+
+type MainMenu struct {
+	ID   int
+	Name string
+}
