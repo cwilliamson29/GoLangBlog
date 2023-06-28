@@ -68,7 +68,35 @@ func (b *BHandlers) PostMenuEditIsNavHandler(w http.ResponseWriter, r *http.Requ
 		b.MenuTempExecute(w, Stat, "menuCreate")
 	}
 }
+func (b *BHandlers) PostMenuDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	//pd := b.UserExists(&models.PageData{}, r)
 
+	// Check if user logged in
+	uAdmin, err := b.IsAdmin(w, r)
+	if err != nil {
+		log.Println(err)
+	}
+	// Check if user is admin
+	if uAdmin {
+		err = r.ParseForm()
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		id, _ := strconv.Atoi(r.Form.Get("menu_id"))
+
+		Stat := make(map[string]interface{})
+
+		// Write to the DB
+		err := b.DB.DeleteMenuById(id)
+		if err != nil {
+			Stat["delNavError"] = err
+		} else {
+			Stat["delNavSuccess"] = "Main Navbar Changed Successfully"
+		}
+		b.MenuTempExecute(w, Stat, "menuCreate")
+	}
+}
 func (b *BHandlers) MenuTempExecute(w http.ResponseWriter, Stat map[string]any, ma string) {
 	var menuList map[int]interface{}
 	menuList, err := b.DB.GetAllMenus()
@@ -76,7 +104,7 @@ func (b *BHandlers) MenuTempExecute(w http.ResponseWriter, Stat map[string]any, 
 		log.Println(err)
 		return
 	}
-	log.Println("****status***", Stat)
+	//log.Println("****status***", Stat)
 	// Redirect back to menu
 	err2 := b.AdminTemplates.ExecuteTemplate(w, "admin.menu.page.tmpl", &models.PageData{
 		//IsAuthenticated: pd.IsAuthenticated,

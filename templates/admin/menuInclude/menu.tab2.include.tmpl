@@ -1,0 +1,45 @@
+{{define "MenuTab2"}}
+    <div class="tab-pane fade {{if eq .MA "menuAddPage"}}show active{{end}}" id="nav-add-page"
+         role="tabpanel"
+         aria-labelledby="nav-add-page-tab">
+        <form method="post" action="/admin/menu/ediit">
+            <div class="row py-1">
+                <div class="col-3 text-end">
+                    <label for="category_id">Select Category:</label>
+                </div>
+                <div class="col-9">
+                    <select name="category_id" id="category_id">
+                        {{ range $key, $menu := .Data}}
+                            <option value="{{$menu.ID}}">{{$menu.ID}} - {{$menu.Name}}</option>
+                        {{end}}
+                    </select>
+                </div>
+            </div>
+            <div class="row py-1">
+                <div class="col-3 text-end">
+                    <label>Is Main Navbar:</label>
+                </div>
+                <div class="col-9">
+                    <input type="checkbox" id="subRemove" name="subRemove" value="true">
+                    <label for="subRemove">Yes</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 mt-3 text-center">
+                    {{with .Status.error}}
+                        <label class="text-danger">{{.}}</label>
+                    {{end}}
+                </div>
+                <div class="col-12 mt-3 text-center">
+                    {{with .Status.success}}
+                        <label class="text-success">{{.}}</label>
+                    {{end}}
+                </div>
+                <div class="col-12 mt-3 text-center">
+                    <button class="w-50 btn btn-lg btn-primary" type="submit">Add To Navbar
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+{{end}}

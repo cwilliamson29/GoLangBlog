@@ -38,6 +38,7 @@ func main() {
 	defer dbc.DB.Close()
 
 	AdminTemplates := template.Must(template.ParseGlob("./templates/admin/*.tmpl"))
+	template.Must(AdminTemplates.ParseGlob("./templates/admin/menuInclude/*.tmpl"))
 	UITemplates := template.Must(template.ParseGlob("./templates/ui/*.tmpl"))
 
 	repo := handlers.NewRepo(dbc, AdminTemplates, UITemplates, sessionManager)
@@ -80,6 +81,7 @@ func main() {
 	router.Post("/admin/category/subcatdel", handlers.Repo.PostSubCategoryDeleteHandler)
 	router.Post("/admin/menu/create", handlers.Repo.PostMenuCreateHandler)
 	router.Post("/admin/menu/editisnav", handlers.Repo.PostMenuEditIsNavHandler)
+	router.Post("/admin/menu/delete", handlers.Repo.PostMenuDeleteHandler)
 
 	fileServer := http.FileServer(http.Dir("./templates/"))
 	router.Handle("/static/*", http.StripPrefix("/static", fileServer))

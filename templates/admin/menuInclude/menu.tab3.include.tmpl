@@ -1,0 +1,121 @@
+{{define "MenuTab3"}}
+    <div class="tab-pane fade {{if eq .MA "menuAddLink"}}show active{{end}}" id="nav-add-link"
+         role="tabpanel"
+         aria-labelledby="nav-add-link-tab">
+        <div class="card my-4">
+            <div class="card-header">
+                <h5>Add Link Menu</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="/admin/menu/createlink">
+                    <div class="row py-1">
+                        <div class="col-3 text-end">
+                            <label for="parent_menu">Parent Menu:</label>
+                        </div>
+                        <div class="col-9">
+                            <select name="parent_menu" id="parent_menu">
+                                {{ range $key, $menu := .Data}}
+                                    <option value="{{$menu.ID}}">{{$menu.ID}}
+                                        - {{$menu.Name}}</option>
+                                {{end}}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row py-1">
+                        <div class="col-3 text-end">
+                            <label for="link_name">Link Name:</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="text" class="form-control" id="link_name"
+                                   name="link_name"
+                                   placeholder="Main Navbar" required>
+                        </div>
+                    </div>
+                    <div class="row py-1">
+                        <div class="col-3 text-end">
+                            <label for="target">Target:</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="text" class="form-control" id="target"
+                                   name="target"
+                                   placeholder="https://www.yourtarget.com" required>
+                        </div>
+                    </div>
+                    <div class="row py-1">
+                        <div class="col-3 text-end">
+                            <label for="position">Position:</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="number" class="form-control" id="position"
+                                   name="position"
+                                   placeholder="1" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 mt-3 text-center">
+                            {{with .Status.createNavError}}
+                                <label class="text-danger">{{.}}</label>
+                            {{end}}
+                        </div>
+                        <div class="col-12 mt-3 text-center">
+                            {{with .Status.createNavSuccess}}
+                                <label class="text-success">{{.}}</label>
+                            {{end}}
+                        </div>
+                        <div class="col-12 mt-3 text-center">
+                            <button class="w-50 btn btn-lg btn-primary" type="submit">Create
+                                Navbar
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="card my-4">
+            <div class="card-header">
+                <h5>Delete Link From Menu</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="/admin/menu/deletelink">
+                    <div class="row py-1">
+                        <div class="col-3 text-end">
+                            <label for="menu_name">Menu Name:</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="text" class="form-control" id="menu_name"
+                                   name="menu_name"
+                                   placeholder="Main Navbar" required>
+                        </div>
+                    </div>
+                    <div class="row py-1">
+                        <div class="col-3 text-end">
+                            <label>Is Main Navbar:</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="checkbox" id="is_navbar" name="is_navbar" value="1">
+                            <label for="is_navbar">Yes</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 mt-3 text-center">
+                            {{with .Status.createNavError}}
+                                <label class="text-danger">{{.}}</label>
+                            {{end}}
+                        </div>
+                        <div class="col-12 mt-3 text-center">
+                            {{with .Status.createNavSuccess}}
+                                <label class="text-success">{{.}}</label>
+                            {{end}}
+                        </div>
+                        <div class="col-12 mt-3 text-center">
+                            <button class="w-50 btn btn-lg btn-primary" type="submit">Create
+                                Navbar
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{{end}}

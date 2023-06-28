@@ -35,7 +35,7 @@ func (m *MySqlDB) GetAllMenus() (map[int]interface{}, error) {
 	return Collection, nil
 }
 
-// MenuCreate - Creates sub category title
+// MenuCreate - Creates menu
 func (m *MySqlDB) MenuCreate(n string, nav int) error {
 	var success bool
 	ct := m.Connect()
@@ -79,4 +79,19 @@ func (m *MySqlDB) UpdateIsNav(n int, id int) bool {
 		suc = m.Update(queryEditIsNav, n, id)
 	}
 	return suc
+}
+
+// DeleteCategoryById
+func (m *MySqlDB) DeleteMenuById(id int) error {
+	var success bool
+	ct := m.Connect()
+	if ct {
+		success = m.Delete(queryDeleteMenu, id)
+	}
+	// check if return true for success
+	if success {
+		return nil
+	} else {
+		return errors.New("Menu has references to menu items")
+	}
 }

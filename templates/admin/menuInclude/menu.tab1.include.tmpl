@@ -1,0 +1,140 @@
+{{define "MenuTab1"}}
+    <div class="tab-pane fade {{if eq .MA "menuCreate"}}show active{{end}}" id="nav-create"
+         role="tabpanel"
+         aria-labelledby="nav-create-tab">
+        <div class="card my-4">
+            <div class="card-header">
+                <h5>Create Menu</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="/admin/menu/create">
+                    <div class="row py-1">
+                        <div class="col-3 text-end">
+                            <label for="menu_name">Menu Name:</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="text" class="form-control" id="menu_name"
+                                   name="menu_name"
+                                   placeholder="Main Navbar" required>
+                        </div>
+                    </div>
+                    <div class="row py-1">
+                        <div class="col-3 text-end">
+                            <label>Is Main Navbar:</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="checkbox" id="is_navbar" name="is_navbar" value="1">
+                            <label for="is_navbar">Yes</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 mt-3 text-center">
+                            {{with .Status.createNavError}}
+                                <label class="text-danger">{{.}}</label>
+                            {{end}}
+                        </div>
+                        <div class="col-12 mt-3 text-center">
+                            {{with .Status.createNavSuccess}}
+                                <label class="text-success">{{.}}</label>
+                            {{end}}
+                        </div>
+                        <div class="col-12 mt-3 text-center">
+                            <button class="w-50 btn btn-lg btn-primary" type="submit">Create
+                                Navbar
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="card my-4">
+            <div class="card-header">
+                <h5>Change Main Navbar</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="/admin/menu/editisnav">
+                    <div class="row py-1">
+                        <div class="col-3 text-end">
+                            <label for="menu_id">Select Menu:</label>
+                        </div>
+                        <div class="col-9">
+                            <select name="menu_id" id="menu_id">
+                                {{ range $key, $menu := .Data}}
+                                    <option value="{{$menu.ID}}">{{$menu.ID}}
+                                        - {{$menu.Name}} {{if eq $menu.IsNavbar 1}} [CURRENT NAVBAR] {{end}}</option>
+                                {{end}}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row py-1">
+                        <div class="col-3 text-end">
+                            <label>Is Main Navbar:</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="radio" id="yes" name="is_navbar" value="1">
+                            <label for="yes">Yes</label>
+                            <input type="radio" id="no" name="is_navbar" value="0">
+                            <label for="no">No</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 mt-3 text-center">
+                            {{with .Status.isNavError}}
+                                <label class="text-danger">{{.}}</label>
+                            {{end}}
+                        </div>
+                        <div class="col-12 mt-3 text-center">
+                            {{with .Status.isNavSuccess}}
+                                <label class="text-success">{{.}}</label>
+                            {{end}}
+                        </div>
+                        <div class="col-12 mt-3 text-center">
+                            <button class="w-50 btn btn-lg btn-primary" type="submit">Change
+                                Main Navbar
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="card my-4">
+            <div class="card-header">
+                <h5>Delete Menu</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="/admin/menu/delete">
+                    <div class="row py-1">
+                        <div class="col-3 text-end">
+                            <label for="menu_id">Select Menu:</label>
+                        </div>
+                        <div class="col-9">
+                            <select name="menu_id" id="menu_id">
+                                {{ range $key, $menu := .Data}}
+                                    <option value="{{$menu.ID}}">{{$menu.ID}}
+                                        - {{$menu.Name}} {{if eq $menu.IsNavbar 1}} [CURRENT NAVBAR] {{end}}</option>
+                                {{end}}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 mt-3 text-center">
+                            {{with .Status.delNavError}}
+                                <label class="text-danger">{{.}}</label>
+                            {{end}}
+                        </div>
+                        <div class="col-12 mt-3 text-center">
+                            {{with .Status.delNavSuccess}}
+                                <label class="text-success">{{.}}</label>
+                            {{end}}
+                        </div>
+                        <div class="col-12 mt-3 text-center">
+                            <button class="w-50 btn btn-lg btn-primary" type="submit">Delete
+                                Navbar
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{{end}}

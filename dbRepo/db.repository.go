@@ -28,4 +28,5 @@ type DatabaseRepo interface {
 	GetAllMenus() (map[int]interface{}, error)
 	MenuCreate(n string, nav int) error
 	UpdateIsNav(n int, id int) bool
+	DeleteMenuById(id int) error
 }
