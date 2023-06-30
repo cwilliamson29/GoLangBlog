@@ -2,6 +2,7 @@ package dbRepo
 
 import (
 	"errors"
+	"fmt"
 	"github.com/cwilliamson29/GoLangBlog/models"
 	"log"
 	"strconv"
@@ -59,6 +60,22 @@ func (m *MySqlDB) MenuCreate(n string, nav int) error {
 	}
 }
 
+// MenuLinkCreate - Creates menu
+func (m *MySqlDB) MenuLinkCreate(pId int, n string, t string, p int) error {
+	var success bool
+	ct := m.Connect()
+	if ct {
+		success, _ = m.Insert(queryCreateMenuLink, n, t, pId, p)
+	}
+	// check if return true for success
+	if success {
+		return nil
+	} else {
+		err := fmt.Sprintf("Menu link not added: ", success)
+		return errors.New(err)
+	}
+}
+
 // IsNavFind - finds entry if 'is_navbar' = true
 func (m *MySqlDB) IsNavFind() ([]string, error) {
 	var results *DbRow
@@ -71,7 +88,7 @@ func (m *MySqlDB) IsNavFind() ([]string, error) {
 	return rtn, nil
 }
 
-// UpdateUser - Updates a user in the database
+// UpdateIsNav - Changes the main navbar for the UI
 func (m *MySqlDB) UpdateIsNav(n int, id int) bool {
 	var suc bool
 	ct := m.Connect()
@@ -81,7 +98,7 @@ func (m *MySqlDB) UpdateIsNav(n int, id int) bool {
 	return suc
 }
 
-// DeleteCategoryById
+// DeleteMenuById - Delete menu by id number
 func (m *MySqlDB) DeleteMenuById(id int) error {
 	var success bool
 	ct := m.Connect()
@@ -93,5 +110,20 @@ func (m *MySqlDB) DeleteMenuById(id int) error {
 		return nil
 	} else {
 		return errors.New("Menu has references to menu items")
+	}
+}
+
+// DeleteMenuById - Delete menu by id number
+func (m *MySqlDB) DeleteMenuLinkById(id int) error {
+	var success bool
+	ct := m.Connect()
+	if ct {
+		success = m.Delete(queryDeleteMenuLink, id)
+	}
+	// check if return true for success
+	if success {
+		return nil
+	} else {
+		return errors.New("Link not removed")
 	}
 }

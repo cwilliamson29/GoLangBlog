@@ -29,4 +29,5 @@ type DatabaseRepo interface {
 	MenuCreate(n string, nav int) error
 	UpdateIsNav(n int, id int) bool
 	DeleteMenuById(id int) error
+	MenuLinkCreate(pId int, n string, t string, p int) error
 }

@@ -32,3 +32,5 @@ var queryCreateMenu = `INSERT INTO menu(name, is_navbar) VALUE (?,?)`
 var queryEditIsNav = `UPDATE menu SET is_navbar=? WHERE id=?`
 var queryFindIsNav = `SELECT id, name FROM menu where is_navbar = 1`
 var queryDeleteMenu = `DELETE FROM menu WHERE id=?`
+var queryCreateMenuLink = `INSERT INTO menu_item(name, target, parent_menu_id, position) VALUE(?,?,?,?)`
+var queryDeleteMenuLink = `DELETE FROM menu_item WHERE id=?`

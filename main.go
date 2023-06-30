@@ -82,8 +82,9 @@ func main() {
 	router.Post("/admin/menu/create", handlers.Repo.PostMenuCreateHandler)
 	router.Post("/admin/menu/editisnav", handlers.Repo.PostMenuEditIsNavHandler)
 	router.Post("/admin/menu/delete", handlers.Repo.PostMenuDeleteHandler)
+	router.Post("/admin/menu/createlink", handlers.Repo.PostMenuCreateLinkHandler)
 
-	fileServer := http.FileServer(http.Dir("./templates/"))
+	fileServer := http.FileServer(http.Dir("./static/"))
 	router.Handle("/static/*", http.StripPrefix("/static", fileServer))
 
 	port := "8080"

@@ -47,19 +47,19 @@
                         </div>
                         <div class="col-9">
                             <input type="number" class="form-control" id="position"
-                                   name="position"
+                                   name="position" min="1" max="50"
                                    placeholder="1" required>
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-12 mt-3 text-center">
-                            {{with .Status.createNavError}}
+                            {{with .Status.createLinkError}}
                                 <label class="text-danger">{{.}}</label>
                             {{end}}
                         </div>
                         <div class="col-12 mt-3 text-center">
-                            {{with .Status.createNavSuccess}}
+                            {{with .Status.createLinkSuccess}}
                                 <label class="text-success">{{.}}</label>
                             {{end}}
                         </div>
@@ -80,21 +80,15 @@
                 <form method="post" action="/admin/menu/deletelink">
                     <div class="row py-1">
                         <div class="col-3 text-end">
-                            <label for="menu_name">Menu Name:</label>
+                            <label for="parent_menu">Link:</label>
                         </div>
                         <div class="col-9">
-                            <input type="text" class="form-control" id="menu_name"
-                                   name="menu_name"
-                                   placeholder="Main Navbar" required>
-                        </div>
-                    </div>
-                    <div class="row py-1">
-                        <div class="col-3 text-end">
-                            <label>Is Main Navbar:</label>
-                        </div>
-                        <div class="col-9">
-                            <input type="checkbox" id="is_navbar" name="is_navbar" value="1">
-                            <label for="is_navbar">Yes</label>
+                            <select name="parent_menu" id="parent_menu">
+                                {{ range $key, $menu := .Data}}
+                                    <option value="{{$menu.ID}}">{{$menu.ID}}
+                                        - {{$menu.Name}}</option>
+                                {{end}}
+                            </select>
                         </div>
                     </div>
                     <div class="row">
@@ -109,8 +103,8 @@
                             {{end}}
                         </div>
                         <div class="col-12 mt-3 text-center">
-                            <button class="w-50 btn btn-lg btn-primary" type="submit">Create
-                                Navbar
+                            <button class="w-50 btn btn-lg btn-primary" type="submit">
+                                Delete Link
                             </button>
                         </div>
                     </div>
